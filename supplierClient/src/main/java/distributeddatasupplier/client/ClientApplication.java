@@ -1,5 +1,6 @@
 package distributeddatasupplier.client;
 
+import configuration.ConfigurationService;
 import distributeddatasupplier.client.processing.AppenderMessageProcessor;
 import distributeddatasupplier.client.processing.MessageProcessor;
 
@@ -8,7 +9,9 @@ import java.io.IOException;
 public class ClientApplication {
     public static void main(String[] args) throws IOException {
         System.out.println("supplierClient started");
-        Client client = new Client("localhost", 5050);
+
+        ConfigurationService configurationService = new ConfigurationService();
+        Client client = new Client(configurationService.getHost(), configurationService.getPort());
         MessageProcessor<String, String> messageProcessor = new AppenderMessageProcessor();
 
         try {
@@ -20,7 +23,7 @@ public class ClientApplication {
                 System.out.println("sent:\t" + processed);
             }
         } catch (IOException e) {
-            System.out.println("supplierClient will be finished due to exception");
+            System.out.println("supplierClient will be finished, server seems to be stopped");
         }
 
         client.stop();
