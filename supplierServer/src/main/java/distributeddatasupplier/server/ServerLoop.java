@@ -20,7 +20,6 @@ public class ServerLoop {
 
     private final Handler handler;
 
-
     public ServerLoop(String host, int port,
                       Handler handler) {
         this.host = host;
@@ -56,7 +55,9 @@ public class ServerLoop {
                     } else if (key.isReadable()) {
                         handler.handleReadable(selector, serverSocket, key);
                     } else if (key.isWritable()) {
-                        handler.handleWritable(selector, serverSocket, key);
+                        if (handler.readyToHandleWritable()) {
+                            handler.handleWritable(selector, serverSocket, key);
+                        }
                     }
                     numberOfReceivedRequests++;
                 } catch (Exception e) {
