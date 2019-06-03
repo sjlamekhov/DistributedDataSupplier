@@ -18,4 +18,8 @@ public class ConfigurationService {
         return Integer.parseInt(properties.getProperty("port", "5050"));
     }
 
+    public long getMaxExecutionTime() {
+        return Long.parseLong(properties.getProperty("maxExecutionTime", "-1"));
+    }
+
 }

@@ -1,6 +1,6 @@
 package distributeddatasupplier.client.processing;
 
-public interface MessageProcessor<I,O> {
+public interface TaskProcessor<I,O> {
 
     O process(I input);
 

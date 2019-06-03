@@ -24,11 +24,14 @@ public class ServerApplication {
         for (int i = 0; i < 32; i++) {
             taskSupplier.addTask(new Task(UUID.randomUUID().toString(), Collections.emptyMap()));
         }
+        System.out.println("configurationService.getMaxExecutionTime():\t"
+                + configurationService.getMaxExecutionTime());
         ServerLoop serverLoop = new ServerLoop(
                 configurationService.getHost(), configurationService.getPort(),
                 new SimpleSysoutHandler(
                         taskSupplier, new IdOnlyTaskMarshaller()
-                )
+                ),
+                configurationService.getMaxExecutionTime()
         );
         serverLoop.start();
         System.out.println("supplierServer finished");

@@ -16,7 +16,11 @@ public class InmemoryTaskSupplier implements TaskSupplier {
 
     @Override
     public Task getTask() {
-        return tasks.poll();
+        if (!isEmpty()) {
+            return tasks.poll();
+        } else {
+            return Task.EMPTY_TASK;
+        }
     }
 
     @Override

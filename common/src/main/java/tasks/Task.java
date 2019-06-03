@@ -20,4 +20,6 @@ public class Task {
     public Map<String, String> getTaskProperties() {
         return Collections.unmodifiableMap(taskProperties);
     }
+
+    public static Task EMPTY_TASK = new Task("EMPTY", Collections.emptyMap());
 }

@@ -24,14 +24,15 @@ public class Client {
         }
     }
 
-    public void sendMessage(String msg) {
+    public boolean sendMessage(String msg) {
         buffer = ByteBuffer.wrap(msg.getBytes());
         try {
             client.write(buffer);
             buffer.clear();
         } catch (IOException e) {
-            e.printStackTrace();
+            return false;
         }
+        return true;
     }
 
     public String getMessage() throws IOException {
