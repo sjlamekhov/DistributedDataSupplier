@@ -2,14 +2,14 @@ package distributeddatasupplier.server;
 
 import configuration.ConfigurationService;
 import distributeddatasupplier.server.network.handlers.SimpleSysoutHandler;
+import distributeddatasupplier.server.network.selectorfactory.NetworkSelectorFactory;
+import distributeddatasupplier.server.network.selectorfactory.SelectorFactory;
 import distributeddatasupplier.server.suppliers.InmemoryTaskSupplier;
-import distributeddatasupplier.server.suppliers.TaskSupplier;
 import tasks.Task;
 import tasks.marshallers.IdOnlyTaskMarshaller;
 
 import java.io.IOException;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.UUID;
 
 public class ServerApplication {
@@ -26,11 +26,15 @@ public class ServerApplication {
         }
         System.out.println("configurationService.getMaxExecutionTime():\t"
                 + configurationService.getMaxExecutionTime());
+        SelectorFactory selectorFactory = new NetworkSelectorFactory(
+                configurationService.getHost(),
+                configurationService.getPort());
         ServerLoop serverLoop = new ServerLoop(
-                configurationService.getHost(), configurationService.getPort(),
                 new SimpleSysoutHandler(
                         taskSupplier, new IdOnlyTaskMarshaller()
                 ),
+                selectorFactory.getSelector(),
+                selectorFactory.getServerSocket(),
                 configurationService.getMaxExecutionTime()
         );
         serverLoop.start();

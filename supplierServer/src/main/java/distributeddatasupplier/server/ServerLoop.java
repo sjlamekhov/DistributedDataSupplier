@@ -12,31 +12,27 @@ import java.util.Set;
 
 public class ServerLoop {
 
-    private static final long REQUEST_COUNT_LIMIT = 64;
-
-    private final String host;
-    private final int port;
     private boolean isStopped;
     private final long maxExecutionTime;
 
     private final Handler handler;
 
-    public ServerLoop(String host, int port,
-                      Handler handler, long maxExecutionTime) {
-        this.host = host;
-        this.port = port;
+    private final Selector selector;
+    private final ServerSocketChannel serverSocket;
+
+    public ServerLoop(Handler handler,
+                      Selector selector,
+                      ServerSocketChannel serverSocket,
+                      long maxExecutionTime) {
         this.isStopped = false;
         this.handler = handler;
+        this.selector = selector;
+        this.serverSocket = serverSocket;
         this.maxExecutionTime = maxExecutionTime;
     }
 
     public void start() throws IOException {
         long startupTime = System.currentTimeMillis();
-        Selector selector = Selector.open();
-        ServerSocketChannel serverSocket = ServerSocketChannel.open();
-        serverSocket.bind(new InetSocketAddress(host, port));
-        serverSocket.configureBlocking(false);
-        serverSocket.register(selector, SelectionKey.OP_ACCEPT);
 
         long numberOfReceivedRequests = 0;
         while (!isStopped) {
@@ -51,12 +47,12 @@ public class ServerLoop {
                 try {
                     if (key.isAcceptable()) {
                         handler.handleAcceptable(selector, serverSocket, null);
-                    } else if (key.isReadable()) {
-                        handler.handleReadable(selector, serverSocket, key);
                     } else if (key.isWritable()) {
                         if (handler.readyToHandleWritable()) {
                             handler.handleWritable(selector, serverSocket, key);
                         }
+                    } else if (key.isReadable()) {
+                        handler.handleReadable(selector, serverSocket, key);
                     }
                     numberOfReceivedRequests++;
                 } catch (Exception e) {
@@ -70,7 +66,8 @@ public class ServerLoop {
 
     private void isExecutionTimeExceeded(long startupTime, long numberOfReceivedRequests) {
         if (maxExecutionTime != -1 && (System.currentTimeMillis() - startupTime) >= maxExecutionTime) {
-            System.out.println(String.format("limit of executionTime is reached:\t%s", numberOfReceivedRequests));
+            System.out.println(String.format("limit of executionTime is reached, numberOfReceivedRequests:\t%s",
+                    numberOfReceivedRequests));
             stop();
         }
     }
