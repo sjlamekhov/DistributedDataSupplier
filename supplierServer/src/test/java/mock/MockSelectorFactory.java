@@ -63,7 +63,7 @@ public class MockSelectorFactory implements SelectorFactory {
 
         doAnswer(invocation -> {
             Object[] args = invocation.getArguments();
-            ((ByteBuffer)args[0]).put("MOCKECLIENTDRESPONSE".getBytes());
+            ((ByteBuffer)args[0]).put("MOCKEDCLIENTRESPONSE".getBytes());
             return 0;
         }).when(socketChannel).read(any(ByteBuffer.class));
 
