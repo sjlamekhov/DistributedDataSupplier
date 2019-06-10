@@ -16,9 +16,13 @@ public class ClientApplication {
         System.out.println("supplierClient started");
 
         ConfigurationService configurationService = new ConfigurationService();
-        Client client = new Client(configurationService.getHost(), configurationService.getPort());
         TaskProcessor<Task, String> taskProcessor = new AppenderTaskProcessor();
         TaskMarshaller taskMarshaller = new IdOnlyTaskMarshaller();
+        Client client = new Client(configurationService.getHost(), configurationService.getPort());
+        if (!client.isStarted()) {
+            System.out.println("supplierClient did not start due to network issues");
+            return;
+        }
         try {
             for (int i = 0; i < 8; i++) {
                 String message = client.getMessage();
@@ -27,7 +31,6 @@ public class ClientApplication {
                 if (Objects.equals(task.getTaskId(), Task.EMPTY_TASK.getTaskId())) {
                     return;
                 }
-                try { Thread.sleep(10000); } catch (Exception e) {}
                 String processed = taskProcessor.process(task);
                 client.sendMessage(processed);
                 System.out.println("sent:\t" + processed);

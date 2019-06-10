@@ -1,11 +1,27 @@
 package distributeddatasupplier.server.suppliers;
 
+import distributeddatasupplier.server.storage.TaskStorage;
 import tasks.Task;
 
-public interface TaskSupplier {
+public class TaskSupplier {
 
-    Task getTask();
+    private final TaskStorage taskStorage;
 
-    boolean isEmpty();
+    public TaskSupplier(TaskStorage taskStorage) {
+        this.taskStorage = taskStorage;
+    }
 
+    public Task getTask() {
+        return taskStorage.getAnyTask();
+    }
+
+    public void addTask(Task task) {
+        taskStorage.addTask(task);
+    }
+
+    public boolean isEmpty() {
+        return taskStorage.isEmpty();
+    }
+
+    public void markTaskAsFinished(String taskId) {}    //for backpressure
 }

@@ -1,9 +1,9 @@
 package server;
 
 import distributeddatasupplier.server.ServerLoop;
-import distributeddatasupplier.server.network.handlers.SimpleSysoutHandler;
 import distributeddatasupplier.server.network.selectorfactory.SelectorFactory;
-import distributeddatasupplier.server.suppliers.InmemoryTaskSupplier;
+import distributeddatasupplier.server.storage.InmemoryTaskStorage;
+import distributeddatasupplier.server.suppliers.TaskSupplier;
 import handlers.DumpableHandler;
 import mock.MockSelectorFactory;
 import org.junit.Assert;
@@ -21,7 +21,7 @@ import static org.junit.Assert.assertTrue;
 public class ServerTest {
 
     private static DumpableHandler getHandler() {
-        InmemoryTaskSupplier taskSupplier = new InmemoryTaskSupplier();
+        TaskSupplier taskSupplier = new TaskSupplier(new InmemoryTaskStorage());
         taskSupplier.addTask(new Task("MOCKEDTASKID", Collections.emptyMap()));
         return new DumpableHandler(
                 taskSupplier, new IdOnlyTaskMarshaller()

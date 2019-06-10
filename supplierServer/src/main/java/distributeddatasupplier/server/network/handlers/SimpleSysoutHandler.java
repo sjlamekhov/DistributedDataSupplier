@@ -1,6 +1,7 @@
 package distributeddatasupplier.server.network.handlers;
 
 import distributeddatasupplier.server.network.SelectorUtils;
+import tasks.Task;
 import tasks.marshallers.TaskMarshaller;
 import distributeddatasupplier.server.suppliers.TaskSupplier;
 
@@ -31,7 +32,9 @@ public class SimpleSysoutHandler implements Handler {
     public void handleReadable(Selector selector, ServerSocketChannel serverSocket, SelectionKey key) throws IOException {
         String message = getMessage(key);
         if (!message.isEmpty()) {
-            System.out.println(String.format("from %s:\t%s", selector.hashCode(), message));
+            Task task = taskMarshaller.unmarshallTask(message);
+            taskSupplier.markTaskAsFinished(task.getTaskId());
+            System.out.println(String.format("from %s:\t%s", selector.hashCode(), task));
             SelectorUtils.prepareForWrite(selector, key);
         }
     }

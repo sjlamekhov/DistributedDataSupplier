@@ -24,6 +24,10 @@ public class Client {
         }
     }
 
+    public boolean isStarted() {
+        return client != null;
+    }
+
     public boolean sendMessage(String msg) {
         buffer = ByteBuffer.wrap(msg.getBytes());
         try {
