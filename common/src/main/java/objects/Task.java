@@ -1,20 +1,19 @@
-package tasks;
+package objects;
 
 import java.util.Collections;
 import java.util.Map;
 
-public class Task {
+public class Task extends AbstractObject {
 
-    private final String taskId;
     private final Map<String, String> taskProperties;
 
     public Task(String taskId, Map<String, String> taskProperties) {
-        this.taskId = taskId;
+        super(new TaskUri(taskId));
         this.taskProperties = taskProperties;
     }
 
-    public String getTaskId() {
-        return taskId;
+    public TaskUri getUri() {
+        return (TaskUri) objectUri;
     }
 
     public Map<String, String> getTaskProperties() {

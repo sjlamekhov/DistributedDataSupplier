@@ -1,6 +1,6 @@
 package distributeddatasupplier.server.storage;
 
-import tasks.Task;
+import objects.Task;
 
 import java.util.ArrayDeque;
 import java.util.Objects;
@@ -25,7 +25,7 @@ public class InmemoryTaskStorage implements TaskStorage {
 
     @Override
     public Task getTaskById(String taskId) {
-        return tasks.stream().filter(i -> taskId.equals(i.getTaskId())).findAny().orElse(null);
+        return tasks.stream().filter(i -> taskId.equals(i.getUri().getId())).findAny().orElse(null);
     }
 
     @Override
@@ -37,7 +37,7 @@ public class InmemoryTaskStorage implements TaskStorage {
 
     @Override
     public void deleteTaskById(String taskId) {
-        tasks.removeIf(i -> taskId.equals(i.getTaskId()));
+        tasks.removeIf(i -> taskId.equals(i.getUri().getId()));
     }
 
     @Override

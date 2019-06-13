@@ -1,12 +1,12 @@
 package distributeddatasupplier.client.processing;
 
-import tasks.Task;
+import objects.Task;
 
 public class AppenderTaskProcessor implements TaskProcessor<Task, String> {
 
     @Override
     public String process(Task task) {
-        return task.getTaskId() + "_" + task.hashCode();
+        return task.getUri().getId() + "_" + task.hashCode();
     }
 
 }

@@ -1,8 +1,8 @@
 package distributeddatasupplier.server.network.handlers;
 
 import distributeddatasupplier.server.network.SelectorUtils;
-import tasks.Task;
-import tasks.marshallers.TaskMarshaller;
+import objects.Task;
+import marshallers.TaskMarshaller;
 import distributeddatasupplier.server.suppliers.TaskSupplier;
 
 import java.io.IOException;
@@ -33,7 +33,7 @@ public class SimpleSysoutHandler implements Handler {
         String message = getMessage(key);
         if (!message.isEmpty()) {
             Task task = taskMarshaller.unmarshallTask(message);
-            taskSupplier.markTaskAsFinished(task.getTaskId());
+            taskSupplier.markTaskAsFinished(task.getUri());
             System.out.println(String.format("from %s:\t%s", selector.hashCode(), task));
             SelectorUtils.prepareForWrite(selector, key);
         }

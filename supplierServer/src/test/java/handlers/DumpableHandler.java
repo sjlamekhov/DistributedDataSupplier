@@ -3,7 +3,7 @@ package handlers;
 import distributeddatasupplier.server.network.SelectorUtils;
 import distributeddatasupplier.server.network.handlers.Handler;
 import distributeddatasupplier.server.suppliers.TaskSupplier;
-import tasks.marshallers.TaskMarshaller;
+import marshallers.TaskMarshaller;
 
 import java.io.IOException;
 import java.nio.channels.SelectionKey;

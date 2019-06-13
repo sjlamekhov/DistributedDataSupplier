@@ -1,6 +1,6 @@
-package tasks.marshallers;
+package marshallers;
 
-import tasks.Task;
+import objects.Task;
 
 public interface TaskMarshaller {
 

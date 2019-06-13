@@ -3,13 +3,12 @@ package distributeddatasupplier.client;
 import configuration.ConfigurationService;
 import distributeddatasupplier.client.processing.AppenderTaskProcessor;
 import distributeddatasupplier.client.processing.TaskProcessor;
-import tasks.Task;
-import tasks.marshallers.IdOnlyTaskMarshaller;
-import tasks.marshallers.TaskMarshaller;
+import objects.Task;
+import marshallers.IdOnlyTaskMarshaller;
+import marshallers.TaskMarshaller;
 
 import java.io.IOException;
 import java.util.Objects;
-import java.util.concurrent.TimeUnit;
 
 public class ClientApplication {
     public static void main(String[] args) throws IOException {
@@ -28,7 +27,7 @@ public class ClientApplication {
                 String message = client.getMessage();
                 System.out.println("received:\t" + message);
                 Task task = taskMarshaller.unmarshallTask(message);
-                if (Objects.equals(task.getTaskId(), Task.EMPTY_TASK.getTaskId())) {
+                if (Objects.equals(task.getUri(), Task.EMPTY_TASK.getUri())) {
                     return;
                 }
                 String processed = taskProcessor.process(task);

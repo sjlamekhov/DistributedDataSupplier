@@ -6,8 +6,8 @@ import distributeddatasupplier.server.network.selectorfactory.NetworkSelectorFac
 import distributeddatasupplier.server.network.selectorfactory.SelectorFactory;
 import distributeddatasupplier.server.storage.InmemoryTaskStorage;
 import distributeddatasupplier.server.suppliers.TaskSupplier;
-import tasks.Task;
-import tasks.marshallers.IdOnlyTaskMarshaller;
+import objects.Task;
+import marshallers.IdOnlyTaskMarshaller;
 
 import java.io.IOException;
 import java.util.Collections;

@@ -6,14 +6,12 @@ import distributeddatasupplier.server.storage.InmemoryTaskStorage;
 import distributeddatasupplier.server.suppliers.TaskSupplier;
 import handlers.DumpableHandler;
 import mock.MockSelectorFactory;
-import org.junit.Assert;
 import org.junit.Test;
-import tasks.Task;
-import tasks.marshallers.IdOnlyTaskMarshaller;
+import objects.Task;
+import marshallers.IdOnlyTaskMarshaller;
 
 import java.io.IOException;
 import java.util.Collections;
-import java.util.UUID;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;

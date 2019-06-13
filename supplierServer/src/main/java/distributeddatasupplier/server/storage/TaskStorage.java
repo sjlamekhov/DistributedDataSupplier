@@ -1,6 +1,6 @@
 package distributeddatasupplier.server.storage;
 
-import tasks.Task;
+import objects.Task;
 
 public interface TaskStorage {
 

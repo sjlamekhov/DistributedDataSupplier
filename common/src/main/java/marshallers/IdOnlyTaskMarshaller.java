@@ -1,6 +1,6 @@
-package tasks.marshallers;
+package marshallers;
 
-import tasks.Task;
+import objects.Task;
 
 import java.util.Collections;
 
@@ -8,7 +8,7 @@ public class IdOnlyTaskMarshaller implements TaskMarshaller {
 
     @Override
     public String mashallTask(Task task) {
-        return task.getTaskId();
+        return task.getUri().getId();
     }
 
     @Override

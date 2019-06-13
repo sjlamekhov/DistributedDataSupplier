@@ -1,7 +1,8 @@
 package distributeddatasupplier.server.suppliers;
 
 import distributeddatasupplier.server.storage.TaskStorage;
-import tasks.Task;
+import objects.Task;
+import objects.TaskUri;
 
 public class TaskSupplier {
 
@@ -23,5 +24,5 @@ public class TaskSupplier {
         return taskStorage.isEmpty();
     }
 
-    public void markTaskAsFinished(String taskId) {}    //for backpressure
+    public void markTaskAsFinished(TaskUri taskUri) {}    //for backpressure
 }
