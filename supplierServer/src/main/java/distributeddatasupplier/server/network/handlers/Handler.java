@@ -11,16 +11,4 @@ public interface Handler {
     void handleReadable(Selector selector, ServerSocketChannel serverSocket, SelectionKey key) throws IOException;
     void handleWritable(Selector selector, ServerSocketChannel serverSocket, SelectionKey key) throws IOException;
 
-    default boolean readyToHandleAcceptable() {
-        return true;
-    }
-
-    default boolean readyToHandleReadable() {
-        return true;
-    }
-
-    default boolean readyToHandleWritable() {
-        return true;
-    }
-
 }

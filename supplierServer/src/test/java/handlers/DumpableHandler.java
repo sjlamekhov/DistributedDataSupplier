@@ -61,9 +61,4 @@ public class DumpableHandler implements Handler {
         SelectorUtils.prepareForRead(selector, key);
     }
 
-    @Override
-    public boolean readyToHandleWritable() {
-        return !taskSupplier.isEmpty();
-    }
-
 }

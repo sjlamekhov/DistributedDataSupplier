@@ -33,7 +33,7 @@ public class ServerLoop {
 
     public void start() throws IOException {
         long startupTime = System.currentTimeMillis();
-
+        int handledAcceptable = 0, handledReadable = 0, handledWritable = 0;
         long numberOfReceivedRequests = 0;
         while (!isStopped) {
             isExecutionTimeExceeded(startupTime, numberOfReceivedRequests);
@@ -43,23 +43,25 @@ public class ServerLoop {
             while (iter.hasNext()) {
 
                 SelectionKey key = iter.next();
+                iter.remove();
 
                 try {
                     if (key.isAcceptable()) {
                         handler.handleAcceptable(selector, serverSocket, null);
+                        handledAcceptable++;
                     } else if (key.isWritable()) {
-                        if (handler.readyToHandleWritable()) {
-                            handler.handleWritable(selector, serverSocket, key);
-                        }
+                        handler.handleWritable(selector, serverSocket, key);
+                        handledWritable++;
                     } else if (key.isReadable()) {
                         handler.handleReadable(selector, serverSocket, key);
+                        handledReadable++;
                     }
                     numberOfReceivedRequests++;
+                    System.out.println(String.format("a:%s, r:%s, w:%s", handledAcceptable, handledReadable, handledWritable));
                 } catch (Exception e) {
                     key.channel().close();
                 }
 
-                iter.remove();
             }
         }
     }
