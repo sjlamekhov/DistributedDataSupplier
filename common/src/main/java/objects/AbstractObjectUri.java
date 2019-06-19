@@ -25,4 +25,9 @@ public abstract class AbstractObjectUri {
         return id != null ? id.hashCode() : 0;
     }
 
+    @Override
+    public String toString() {
+        return id;
+    }
+
 }

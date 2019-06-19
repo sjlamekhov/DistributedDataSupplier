@@ -42,8 +42,9 @@ public class SimpleSysoutHandler implements Handler {
                     System.out.println("unexpected message, result == null, message " + message);
                     return;
                 }
+            } else {
+                taskSupplier.markTaskAsFinished(result.getTaskUri());
             }
-//            taskSupplier.markTaskAsFinished(task.getUri());
             System.out.println(String.format("from %s:\t%s", selector.hashCode(), messageObject));
             if (messageObject.getFlowControl() == FlowControl.GETNEXTTASK) {
                 SelectorUtils.prepareForWrite(selector, key);

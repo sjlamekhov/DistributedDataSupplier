@@ -9,9 +9,10 @@ public class AppenderTaskProcessor implements TaskProcessor<Task, Result> {
 
     @Override
     public Result process(Task task) {
-        return new Result(new HashMap(){{
-            put(task.getUri().getId(), String.valueOf(task.hashCode()));
-        }});
+        return new Result(task.getUri(),
+                new HashMap() {{
+                    put(task.getUri().getId(), String.valueOf(task.hashCode()));
+                }});
     }
 
 }

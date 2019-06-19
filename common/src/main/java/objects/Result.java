@@ -7,9 +7,15 @@ import java.util.Map;
 public class Result {
 
     private final Map<String, String> result;
+    private final TaskUri taskUri;
 
-    public Result(Map<String, String> keysAndValues) {
+    public Result(TaskUri taskUri, Map<String, String> keysAndValues) {
+        this.taskUri = taskUri;
         result = new HashMap<>(keysAndValues);
+    }
+
+    public TaskUri getTaskUri() {
+        return taskUri;
     }
 
     public Map<String, String> getFields() {
