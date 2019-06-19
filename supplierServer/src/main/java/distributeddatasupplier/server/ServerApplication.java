@@ -6,6 +6,8 @@ import distributeddatasupplier.server.network.selectorfactory.NetworkSelectorFac
 import distributeddatasupplier.server.network.selectorfactory.SelectorFactory;
 import distributeddatasupplier.server.storage.InmemoryTaskStorage;
 import distributeddatasupplier.server.suppliers.TaskSupplier;
+import marshallers.MessageMarshaller;
+import marshallers.ResultMarshaller;
 import objects.Task;
 import marshallers.IdOnlyTaskMarshaller;
 
@@ -22,6 +24,8 @@ public class ServerApplication {
         System.out.println(String.format("host=%s, port=%s",
                 configurationService.getHost(), configurationService.getPort()));
         TaskSupplier taskSupplier = new TaskSupplier(new InmemoryTaskStorage());
+        MessageMarshaller messageMarshaller = new MessageMarshaller(
+                new IdOnlyTaskMarshaller(), new ResultMarshaller());
         for (int i = 0; i < 32; i++) {
             taskSupplier.addTask(new Task(UUID.randomUUID().toString(), Collections.emptyMap()));
         }
@@ -31,9 +35,7 @@ public class ServerApplication {
                 configurationService.getHost(),
                 configurationService.getPort());
         ServerLoop serverLoop = new ServerLoop(
-                new SimpleSysoutHandler(
-                        taskSupplier, new IdOnlyTaskMarshaller()
-                ),
+                new SimpleSysoutHandler(taskSupplier, messageMarshaller),
                 selectorFactory.getSelector(),
                 selectorFactory.getServerSocket(),
                 configurationService.getMaxExecutionTime()

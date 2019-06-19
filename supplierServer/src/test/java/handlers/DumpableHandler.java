@@ -3,7 +3,9 @@ package handlers;
 import distributeddatasupplier.server.network.SelectorUtils;
 import distributeddatasupplier.server.network.handlers.Handler;
 import distributeddatasupplier.server.suppliers.TaskSupplier;
-import marshallers.TaskMarshaller;
+import marshallers.MessageMarshaller;
+import messaging.FlowControl;
+import messaging.Message;
 
 import java.io.IOException;
 import java.nio.channels.SelectionKey;
@@ -19,13 +21,13 @@ import static distributeddatasupplier.server.network.MessagingUtils.sendMessage;
 public class DumpableHandler implements Handler {
 
     private final TaskSupplier taskSupplier;
-    private final TaskMarshaller taskMarshaller;
+    private final MessageMarshaller messageMarshaller;
     private final List<String> messagesFromServer;
     private final List<String> messagesFromClient;
 
-    public DumpableHandler(TaskSupplier taskSupplier, TaskMarshaller taskMarshaller) {
+    public DumpableHandler(TaskSupplier taskSupplier, MessageMarshaller messageMarshaller) {
         this.taskSupplier = taskSupplier;
-        this.taskMarshaller = taskMarshaller;
+        this.messageMarshaller = messageMarshaller;
         this.messagesFromServer = new ArrayList<>();
         this.messagesFromClient = new ArrayList<>();
     }
@@ -55,7 +57,7 @@ public class DumpableHandler implements Handler {
 
     @Override
     public void handleWritable(Selector selector, ServerSocketChannel serverSocket, SelectionKey key) throws IOException {
-        String message = taskMarshaller.mashallTask(taskSupplier.getTask());
+        String message = messageMarshaller.marshall(new Message(taskSupplier.getTask(), FlowControl.DUMMY));
         sendMessage(key, message);
         messagesFromServer.add(message);
         SelectorUtils.prepareForRead(selector, key);

@@ -1,8 +1,10 @@
 package distributeddatasupplier.server.network.handlers;
 
 import distributeddatasupplier.server.network.SelectorUtils;
-import objects.Task;
-import marshallers.TaskMarshaller;
+import marshallers.MessageMarshaller;
+import messaging.FlowControl;
+import messaging.Message;
+import objects.Result;
 import distributeddatasupplier.server.suppliers.TaskSupplier;
 
 import java.io.IOException;
@@ -16,11 +18,11 @@ import static distributeddatasupplier.server.network.MessagingUtils.sendMessage;
 public class SimpleSysoutHandler implements Handler {
 
     private final TaskSupplier taskSupplier;
-    private final TaskMarshaller taskMarshaller;
+    private final MessageMarshaller messageMarshaller;
 
-    public SimpleSysoutHandler(TaskSupplier taskSupplier, TaskMarshaller taskMarshaller) {
+    public SimpleSysoutHandler(TaskSupplier taskSupplier, MessageMarshaller messageMarshaller) {
         this.taskSupplier = taskSupplier;
-        this.taskMarshaller = taskMarshaller;
+        this.messageMarshaller = messageMarshaller;
     }
 
     @Override
@@ -32,14 +34,20 @@ public class SimpleSysoutHandler implements Handler {
     public void handleReadable(Selector selector, ServerSocketChannel serverSocket, SelectionKey key) throws IOException {
         String message = getMessage(key);
         if (!message.isEmpty()) {
-            Task task = taskMarshaller.unmarshallTask(message.split(";")[0]);
-            taskSupplier.markTaskAsFinished(task.getUri());
-            System.out.println(String.format("from %s:\t%s", selector.hashCode(), task));
-            if (message.endsWith(";GETNEXTTASK")) {
-                SelectorUtils.prepareForWrite(selector, key);
-            } else if (message.endsWith(";LAST")) {
+            Message messageObject = messageMarshaller.unmarshall(message);
+            Result result = messageObject.getResult();
+            if (result == null) {
                 key.cancel();
-            } else if (message.endsWith(";BYE")) {
+                if (messageObject.getFlowControl() != FlowControl.BYE) {
+                    System.out.println("unexpected message, result == null, message " + message);
+                    return;
+                }
+            }
+//            taskSupplier.markTaskAsFinished(task.getUri());
+            System.out.println(String.format("from %s:\t%s", selector.hashCode(), messageObject));
+            if (messageObject.getFlowControl() == FlowControl.GETNEXTTASK) {
+                SelectorUtils.prepareForWrite(selector, key);
+            } else if (messageObject.getFlowControl() == FlowControl.LAST) {
                 key.cancel();
             }
         }
@@ -47,7 +55,7 @@ public class SimpleSysoutHandler implements Handler {
 
     @Override
     public void handleWritable(Selector selector, ServerSocketChannel serverSocket, SelectionKey key) throws IOException {
-        sendMessage(key, taskMarshaller.mashallTask(taskSupplier.getTask()));
+        sendMessage(key, messageMarshaller.marshall(new Message(taskSupplier.getTask(), FlowControl.DUMMY)));
         SelectorUtils.prepareForRead(selector, key);
     }
 

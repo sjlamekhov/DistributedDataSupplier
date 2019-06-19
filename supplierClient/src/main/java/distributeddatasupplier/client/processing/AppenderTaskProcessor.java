@@ -1,12 +1,17 @@
 package distributeddatasupplier.client.processing;
 
+import objects.Result;
 import objects.Task;
 
-public class AppenderTaskProcessor implements TaskProcessor<Task, String> {
+import java.util.HashMap;
+
+public class AppenderTaskProcessor implements TaskProcessor<Task, Result> {
 
     @Override
-    public String process(Task task) {
-        return task.getUri().getId() + "_" + task.hashCode();
+    public Result process(Task task) {
+        return new Result(new HashMap(){{
+            put(task.getUri().getId(), String.valueOf(task.hashCode()));
+        }});
     }
 
 }

@@ -4,15 +4,15 @@ import objects.Task;
 
 import java.util.Collections;
 
-public class IdOnlyTaskMarshaller implements TaskMarshaller {
+public class IdOnlyTaskMarshaller implements Marshaller<Task> {
 
     @Override
-    public String mashallTask(Task task) {
+    public String marshall(Task task) {
         return task.getUri().getId();
     }
 
     @Override
-    public Task unmarshallTask(String string) {
+    public Task unmarshall(String string) {
         return new Task(string, Collections.EMPTY_MAP);
     }
 }
