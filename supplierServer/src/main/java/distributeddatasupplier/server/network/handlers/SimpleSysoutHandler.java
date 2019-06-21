@@ -1,6 +1,7 @@
 package distributeddatasupplier.server.network.handlers;
 
 import distributeddatasupplier.server.network.SelectorUtils;
+import distributeddatasupplier.server.network.messageTransceiver.Transceiver;
 import marshallers.MessageMarshaller;
 import messaging.FlowControl;
 import messaging.Message;
@@ -12,16 +13,15 @@ import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
 
-import static distributeddatasupplier.server.network.MessagingUtils.getMessage;
-import static distributeddatasupplier.server.network.MessagingUtils.sendMessage;
-
 public class SimpleSysoutHandler implements Handler {
 
     private final TaskSupplier taskSupplier;
+    private final Transceiver transceiver;
     private final MessageMarshaller messageMarshaller;
 
-    public SimpleSysoutHandler(TaskSupplier taskSupplier, MessageMarshaller messageMarshaller) {
+    public SimpleSysoutHandler(TaskSupplier taskSupplier, Transceiver transceiver, MessageMarshaller messageMarshaller) {
         this.taskSupplier = taskSupplier;
+        this.transceiver = transceiver;
         this.messageMarshaller = messageMarshaller;
     }
 
@@ -32,7 +32,7 @@ public class SimpleSysoutHandler implements Handler {
 
     @Override
     public void handleReadable(Selector selector, ServerSocketChannel serverSocket, SelectionKey key) throws IOException {
-        String message = getMessage(key);
+        String message = transceiver.getMessage(key);
         if (!message.isEmpty()) {
             Message messageObject = messageMarshaller.unmarshall(message);
             Result result = messageObject.getResult();
@@ -56,7 +56,7 @@ public class SimpleSysoutHandler implements Handler {
 
     @Override
     public void handleWritable(Selector selector, ServerSocketChannel serverSocket, SelectionKey key) throws IOException {
-        sendMessage(key, messageMarshaller.marshall(new Message(taskSupplier.getTask(), FlowControl.DUMMY)));
+        transceiver.sendMessage(key, messageMarshaller.marshall(new Message(taskSupplier.getTask(), FlowControl.DUMMY)));
         SelectorUtils.prepareForRead(selector, key);
     }
 

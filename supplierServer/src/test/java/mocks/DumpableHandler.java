@@ -1,7 +1,9 @@
-package handlers;
+package mocks;
 
 import distributeddatasupplier.server.network.SelectorUtils;
 import distributeddatasupplier.server.network.handlers.Handler;
+import distributeddatasupplier.server.network.messageTransceiver.NetworkTransceiver;
+import distributeddatasupplier.server.network.messageTransceiver.Transceiver;
 import distributeddatasupplier.server.suppliers.TaskSupplier;
 import marshallers.MessageMarshaller;
 import messaging.FlowControl;
@@ -15,18 +17,17 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import static distributeddatasupplier.server.network.MessagingUtils.getMessage;
-import static distributeddatasupplier.server.network.MessagingUtils.sendMessage;
-
 public class DumpableHandler implements Handler {
 
     private final TaskSupplier taskSupplier;
+    private final Transceiver transceiver;
     private final MessageMarshaller messageMarshaller;
     private final List<String> messagesFromServer;
     private final List<String> messagesFromClient;
 
     public DumpableHandler(TaskSupplier taskSupplier, MessageMarshaller messageMarshaller) {
         this.taskSupplier = taskSupplier;
+        this.transceiver = new NetworkTransceiver();
         this.messageMarshaller = messageMarshaller;
         this.messagesFromServer = new ArrayList<>();
         this.messagesFromClient = new ArrayList<>();
@@ -47,7 +48,7 @@ public class DumpableHandler implements Handler {
 
     @Override
     public void handleReadable(Selector selector, ServerSocketChannel serverSocket, SelectionKey key) throws IOException {
-        String message = getMessage(key);
+        String message = transceiver.getMessage(key);
         if (!message.isEmpty()) {
             messagesFromClient.add(message);
             System.out.println(String.format("from %s:\t%s", selector.hashCode(), message));
@@ -58,7 +59,7 @@ public class DumpableHandler implements Handler {
     @Override
     public void handleWritable(Selector selector, ServerSocketChannel serverSocket, SelectionKey key) throws IOException {
         String message = messageMarshaller.marshall(new Message(taskSupplier.getTask(), FlowControl.DUMMY));
-        sendMessage(key, message);
+        transceiver.sendMessage(key, message);
         messagesFromServer.add(message);
         SelectorUtils.prepareForRead(selector, key);
     }

@@ -24,5 +24,8 @@ public class TaskSupplier {
         return taskStorage.isEmpty();
     }
 
-    public void markTaskAsFinished(TaskUri taskUri) {}    //for backpressure
+    //for backpressure
+    public void markTaskAsFinished(TaskUri taskUri) {
+        taskStorage.markTaskAsFinished(taskUri.getId());
+    }
 }

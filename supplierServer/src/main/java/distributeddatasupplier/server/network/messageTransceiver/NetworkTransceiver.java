@@ -1,13 +1,13 @@
-package distributeddatasupplier.server.network;
+package distributeddatasupplier.server.network.messageTransceiver;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.SocketChannel;
 
-public class MessagingUtils {
+public class NetworkTransceiver implements Transceiver {
 
-    public static void sendMessage(SelectionKey key, String message)
+    public void sendMessage(SelectionKey key, String message)
             throws IOException {
         SocketChannel client = (SocketChannel) key.channel();
         ByteBuffer myBuffer=ByteBuffer.allocate(1024);
@@ -17,7 +17,7 @@ public class MessagingUtils {
         System.out.println(String.format("bytesWritten:\t%s", bytesWritten));
     }
 
-    public static String getMessage(SelectionKey key)
+    public String getMessage(SelectionKey key)
             throws IOException {
         SocketChannel client = (SocketChannel) key.channel();
         ByteBuffer myBuffer = ByteBuffer.allocate(1024);

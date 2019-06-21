@@ -17,6 +17,9 @@ public class ResultMarshaller implements Marshaller<Result> {
         StringBuilder stringBuffer = new StringBuilder();
         stringBuffer.append(result.getTaskUri());
         stringBuffer.append(BODY_SEPARATOR);
+        if (result.getFields().isEmpty()) {
+            stringBuffer.append(FIELD_SEPARATOR);
+        }
         for (Map.Entry<String, String> entry : result.getFields().entrySet()) {
             stringBuffer.append(String.format("%s%s%s%s",
                     entry.getKey(), KEYVALUE_SEPARATOR,

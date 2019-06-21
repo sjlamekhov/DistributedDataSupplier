@@ -32,7 +32,7 @@ public class MockSelectorFactory implements SelectorFactory {
         return abstractSelector;
     }
 
-    private static SelectionKey getAcceptableKey() {
+    public static SelectionKey getAcceptableKey() {
         SelectionKey acceptableKey = mock(SelectionKey.class);
         doReturn(SelectionKey.OP_ACCEPT).when(acceptableKey).readyOps();
         doReturn(true).when(acceptableKey).isAcceptable();
@@ -41,7 +41,7 @@ public class MockSelectorFactory implements SelectorFactory {
         return acceptableKey;
     }
 
-    private static SelectionKey getWritableKey() throws IOException {
+    public static SelectionKey getWritableKey() throws IOException {
         SelectionKey writableKey = mock(SelectionKey.class);
         doReturn(SelectionKey.OP_WRITE).when(writableKey).readyOps();
         doReturn(true).when(writableKey).isWritable();
@@ -53,7 +53,7 @@ public class MockSelectorFactory implements SelectorFactory {
         return writableKey;
     }
 
-    private static SelectionKey getReadableKey() throws IOException {
+    public static SelectionKey getReadableKey() throws IOException {
         SelectionKey readableKey = mock(SelectionKey.class);
         doReturn(SelectionKey.OP_READ).when(readableKey).readyOps();
         doReturn(true).when(readableKey).isReadable();

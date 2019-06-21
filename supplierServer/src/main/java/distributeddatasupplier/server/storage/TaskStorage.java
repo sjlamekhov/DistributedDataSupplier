@@ -1,6 +1,7 @@
 package distributeddatasupplier.server.storage;
 
 import objects.Task;
+import objects.TaskUri;
 
 public interface TaskStorage {
 
@@ -14,4 +15,5 @@ public interface TaskStorage {
 
     boolean isEmpty();
 
+    void markTaskAsFinished(String taskId);
 }

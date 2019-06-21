@@ -2,6 +2,7 @@ package distributeddatasupplier.server;
 
 import configuration.ConfigurationService;
 import distributeddatasupplier.server.network.handlers.SimpleSysoutHandler;
+import distributeddatasupplier.server.network.messageTransceiver.NetworkTransceiver;
 import distributeddatasupplier.server.network.selectorfactory.NetworkSelectorFactory;
 import distributeddatasupplier.server.network.selectorfactory.SelectorFactory;
 import distributeddatasupplier.server.storage.InmemoryTaskStorage;
@@ -35,7 +36,7 @@ public class ServerApplication {
                 configurationService.getHost(),
                 configurationService.getPort());
         ServerLoop serverLoop = new ServerLoop(
-                new SimpleSysoutHandler(taskSupplier, messageMarshaller),
+                new SimpleSysoutHandler(taskSupplier, new NetworkTransceiver(), messageMarshaller),
                 selectorFactory.getSelector(),
                 selectorFactory.getServerSocket(),
                 configurationService.getMaxExecutionTime()
