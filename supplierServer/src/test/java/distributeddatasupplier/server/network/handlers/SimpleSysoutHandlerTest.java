@@ -1,6 +1,8 @@
 package distributeddatasupplier.server.network.handlers;
 
-import distributeddatasupplier.server.storage.InmemoryTaskStorage;
+import distributeddatasupplier.server.persistence.InMemoryTaskPersistence;
+import distributeddatasupplier.server.persistence.TaskPersistenceLayer;
+import distributeddatasupplier.server.storage.TaskStorageImplementation;
 import distributeddatasupplier.server.storage.TaskStorage;
 import distributeddatasupplier.server.suppliers.TaskSupplier;
 import marshallers.IdOnlyTaskMarshaller;
@@ -12,6 +14,7 @@ import mock.MockSelectorFactory;
 import mocks.TranceiverMock;
 import objects.Result;
 import objects.Task;
+import objects.TaskStatus;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -60,7 +63,7 @@ public class SimpleSysoutHandlerTest {
 
     @Test
     public void handleWritable() throws IOException {
-        Assert.assertFalse(taskStorage.isEmpty());
+        Assert.assertTrue(!taskStorage.isEmpty(TaskStatus.NOT_STARTED));
         while (!taskSupplier.isEmpty()) {
             simpleSysoutHandler.handleWritable(
                     mockSelectorFactory.getSelector(),
@@ -68,13 +71,14 @@ public class SimpleSysoutHandlerTest {
                     MockSelectorFactory.getReadableKey()
             );
         }
-        Assert.assertTrue(taskStorage.isEmpty());
+        Assert.assertTrue(taskStorage.isEmpty(TaskStatus.NOT_STARTED));
         Assert.assertEquals(TASK_NUMBER, sendedMessages.size());
     }
 
     @Before
     public void init() {
-        taskStorage = new InmemoryTaskStorage();
+        TaskPersistenceLayer taskPersistenceLayer = new InMemoryTaskPersistence();
+        taskStorage = new TaskStorageImplementation(taskPersistenceLayer);
         fillTestData(taskStorage);
         taskSupplier = new TaskSupplier(taskStorage);
         messageMarshaller = new MessageMarshaller(new IdOnlyTaskMarshaller(), new ResultMarshaller());

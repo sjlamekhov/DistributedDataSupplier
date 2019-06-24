@@ -37,7 +37,7 @@ public class ServerLoop {
         long numberOfReceivedRequests = 0;
         while (!isStopped) {
             isExecutionTimeExceeded(startupTime, numberOfReceivedRequests);
-            selector.select();
+            selector.select(1000);
             Set<SelectionKey> selectedKeys = selector.selectedKeys();
             Iterator<SelectionKey> iter = selectedKeys.iterator();
             while (iter.hasNext()) {

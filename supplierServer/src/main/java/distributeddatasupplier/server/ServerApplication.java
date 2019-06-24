@@ -5,7 +5,9 @@ import distributeddatasupplier.server.network.handlers.SimpleSysoutHandler;
 import distributeddatasupplier.server.network.messageTransceiver.NetworkTransceiver;
 import distributeddatasupplier.server.network.selectorfactory.NetworkSelectorFactory;
 import distributeddatasupplier.server.network.selectorfactory.SelectorFactory;
-import distributeddatasupplier.server.storage.InmemoryTaskStorage;
+import distributeddatasupplier.server.persistence.InMemoryTaskPersistence;
+import distributeddatasupplier.server.persistence.TaskPersistenceLayer;
+import distributeddatasupplier.server.storage.TaskStorageImplementation;
 import distributeddatasupplier.server.suppliers.TaskSupplier;
 import marshallers.MessageMarshaller;
 import marshallers.ResultMarshaller;
@@ -24,7 +26,8 @@ public class ServerApplication {
         ConfigurationService configurationService = new ConfigurationService();
         System.out.println(String.format("host=%s, port=%s",
                 configurationService.getHost(), configurationService.getPort()));
-        TaskSupplier taskSupplier = new TaskSupplier(new InmemoryTaskStorage());
+        TaskPersistenceLayer taskPersistenceLayer = new InMemoryTaskPersistence();
+        TaskSupplier taskSupplier = new TaskSupplier(new TaskStorageImplementation(taskPersistenceLayer));
         MessageMarshaller messageMarshaller = new MessageMarshaller(
                 new IdOnlyTaskMarshaller(), new ResultMarshaller());
         for (int i = 0; i < 32; i++) {
@@ -41,6 +44,7 @@ public class ServerApplication {
                 selectorFactory.getServerSocket(),
                 configurationService.getMaxExecutionTime()
         );
+        //TODO: start in separate thread
         serverLoop.start();
         System.out.println("supplierServer finished");
     }

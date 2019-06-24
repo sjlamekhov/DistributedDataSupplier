@@ -2,6 +2,7 @@ package distributeddatasupplier.server.suppliers;
 
 import distributeddatasupplier.server.storage.TaskStorage;
 import objects.Task;
+import objects.TaskStatus;
 import objects.TaskUri;
 
 public class TaskSupplier {
@@ -21,7 +22,7 @@ public class TaskSupplier {
     }
 
     public boolean isEmpty() {
-        return taskStorage.isEmpty();
+        return taskStorage.isEmpty(TaskStatus.NOT_STARTED);
     }
 
     //for backpressure

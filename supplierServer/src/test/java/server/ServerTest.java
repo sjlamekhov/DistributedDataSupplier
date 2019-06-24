@@ -2,7 +2,9 @@ package server;
 
 import distributeddatasupplier.server.ServerLoop;
 import distributeddatasupplier.server.network.selectorfactory.SelectorFactory;
-import distributeddatasupplier.server.storage.InmemoryTaskStorage;
+import distributeddatasupplier.server.persistence.InMemoryTaskPersistence;
+import distributeddatasupplier.server.persistence.TaskPersistenceLayer;
+import distributeddatasupplier.server.storage.TaskStorageImplementation;
 import distributeddatasupplier.server.suppliers.TaskSupplier;
 import mock.MockSelectorFactory;
 import mocks.DumpableHandler;
@@ -25,7 +27,8 @@ public class ServerTest {
     }
 
     private static DumpableHandler getHandler() {
-        TaskSupplier taskSupplier = new TaskSupplier(new InmemoryTaskStorage());
+        TaskPersistenceLayer taskPersistenceLayer = new InMemoryTaskPersistence();
+        TaskSupplier taskSupplier = new TaskSupplier(new TaskStorageImplementation(taskPersistenceLayer));
         taskSupplier.addTask(new Task("MOCKEDTASKID", Collections.emptyMap()));
         return new DumpableHandler(
                 taskSupplier, getMessageMarshaller()
