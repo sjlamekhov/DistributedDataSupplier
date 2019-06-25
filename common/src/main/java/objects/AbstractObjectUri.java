@@ -1,8 +1,14 @@
 package objects;
 
+import dao.UriGenerator;
+
 public abstract class AbstractObjectUri {
 
     protected final String id;
+
+    public AbstractObjectUri() {
+        this.id = UriGenerator.generateId();
+    }
 
     public AbstractObjectUri(String id) {
         this.id = id;

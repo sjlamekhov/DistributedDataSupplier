@@ -2,6 +2,7 @@ package distributeddatasupplier.server.network.handlers;
 
 import distributeddatasupplier.server.network.SelectorUtils;
 import distributeddatasupplier.server.network.messageTransceiver.Transceiver;
+import distributeddatasupplier.server.services.ResultService;
 import marshallers.MessageMarshaller;
 import messaging.FlowControl;
 import messaging.Message;
@@ -13,14 +14,19 @@ import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
 
-public class SimpleSysoutHandler implements Handler {
+public class SimpleHandler implements Handler {
 
     private final TaskSupplier taskSupplier;
+    private final ResultService resultService;
     private final Transceiver transceiver;
     private final MessageMarshaller messageMarshaller;
 
-    public SimpleSysoutHandler(TaskSupplier taskSupplier, Transceiver transceiver, MessageMarshaller messageMarshaller) {
+    public SimpleHandler(TaskSupplier taskSupplier,
+                         ResultService resultService,
+                         Transceiver transceiver,
+                         MessageMarshaller messageMarshaller) {
         this.taskSupplier = taskSupplier;
+        this.resultService = resultService;
         this.transceiver = transceiver;
         this.messageMarshaller = messageMarshaller;
     }
@@ -43,6 +49,7 @@ public class SimpleSysoutHandler implements Handler {
                     return;
                 }
             } else {
+                resultService.add(result);
                 taskSupplier.markTaskAsFinished(result.getTaskUri());
             }
             System.out.println(String.format("from %s:\t%s", selector.hashCode(), messageObject));

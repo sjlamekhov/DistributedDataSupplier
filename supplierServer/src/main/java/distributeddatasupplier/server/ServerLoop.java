@@ -20,6 +20,8 @@ public class ServerLoop {
     private final Selector selector;
     private final ServerSocketChannel serverSocket;
 
+    private static final int timeout = 1000;
+
     public ServerLoop(Handler handler,
                       Selector selector,
                       ServerSocketChannel serverSocket,
@@ -37,7 +39,7 @@ public class ServerLoop {
         long numberOfReceivedRequests = 0;
         while (!isStopped) {
             isExecutionTimeExceeded(startupTime, numberOfReceivedRequests);
-            selector.select(1000);
+            selector.select(timeout);
             Set<SelectionKey> selectedKeys = selector.selectedKeys();
             Iterator<SelectionKey> iter = selectedKeys.iterator();
             while (iter.hasNext()) {

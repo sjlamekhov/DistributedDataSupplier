@@ -1,8 +1,9 @@
-package distributeddatasupplier.server.persistence;
+package persistence.tasks;
 
 import objects.Task;
 import objects.TaskStatus;
 import objects.TaskUri;
+import persistence.PersistenceLayer;
 
 import java.util.Collection;
 

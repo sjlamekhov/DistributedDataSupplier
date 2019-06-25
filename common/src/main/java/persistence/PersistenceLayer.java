@@ -4,8 +4,9 @@ import objects.AbstractObject;
 import objects.AbstractObjectUri;
 
 import java.util.Collection;
+import java.util.Iterator;
 
-public interface PersistenceLayer<T extends AbstractObject,U extends AbstractObjectUri> {
+public interface PersistenceLayer<U extends AbstractObjectUri, T extends AbstractObject> {
 
     boolean isUriPresented(U uri);
     T add(T object);
@@ -13,5 +14,7 @@ public interface PersistenceLayer<T extends AbstractObject,U extends AbstractObj
     T getByUri(U objectUri);
     Collection<T> getByUris(Collection<U> objectUris);
     void deleteObject(U uri);
+    Iterator<U> getUriIterator();
 
 }
+

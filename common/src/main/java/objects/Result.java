@@ -4,14 +4,19 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-public class Result {
+public class Result extends AbstractObject {
 
     private final Map<String, String> result;
     private final TaskUri taskUri;
 
-    public Result(TaskUri taskUri, Map<String, String> keysAndValues) {
+    public Result(ResultUri resultUri, TaskUri taskUri, Map<String, String> keysAndValues) {
+        super(resultUri);
         this.taskUri = taskUri;
         result = new HashMap<>(keysAndValues);
+    }
+
+    public ResultUri getUri() {
+        return (ResultUri) objectUri;
     }
 
     public TaskUri getTaskUri() {

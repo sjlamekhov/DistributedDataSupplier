@@ -1,6 +1,7 @@
 package marshallers;
 
 import objects.Result;
+import objects.ResultUri;
 import objects.TaskUri;
 
 import java.util.HashMap;
@@ -39,6 +40,6 @@ public class ResultMarshaller implements Marshaller<Result> {
             String[] splittedEntry = splitted[i].split(KEYVALUE_SEPARATOR);
             fields.put(splittedEntry[0], splittedEntry[1]);
         }
-        return new Result(taskUri, fields);
+        return new Result(new ResultUri(), taskUri, fields);
     }
 }

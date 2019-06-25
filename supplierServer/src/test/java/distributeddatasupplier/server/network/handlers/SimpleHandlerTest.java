@@ -1,9 +1,13 @@
 package distributeddatasupplier.server.network.handlers;
 
-import distributeddatasupplier.server.persistence.InMemoryTaskPersistence;
-import distributeddatasupplier.server.persistence.TaskPersistenceLayer;
-import distributeddatasupplier.server.storage.TaskStorageImplementation;
-import distributeddatasupplier.server.storage.TaskStorage;
+import dao.ResultDao;
+import dao.TaskDao;
+import distributeddatasupplier.server.services.ResultService;
+import objects.ResultUri;
+import persistence.InMemoryPersistence;
+import persistence.tasks.InMemoryTaskPersistence;
+import persistence.tasks.TaskPersistenceLayer;
+import distributeddatasupplier.server.services.TaskService;
 import distributeddatasupplier.server.suppliers.TaskSupplier;
 import marshallers.IdOnlyTaskMarshaller;
 import marshallers.MessageMarshaller;
@@ -22,13 +26,18 @@ import org.junit.Test;
 import java.io.IOException;
 import java.util.*;
 
-public class SimpleSysoutHandlerTest {
+public class SimpleHandlerTest {
 
     private MockSelectorFactory mockSelectorFactory = new MockSelectorFactory();
-    private SimpleSysoutHandler simpleSysoutHandler = null;
-    private TaskStorage taskStorage;
+    private SimpleHandler simpleHandler = null;
     private MessageMarshaller messageMarshaller;
+
+    private TaskService taskService;
     private TaskSupplier taskSupplier;
+
+    private InMemoryPersistence<ResultUri, Result> resultPersistence;
+    private ResultService resultService;
+
     private ArrayDeque<String> sendedMessages = new ArrayDeque<>();
     private ArrayDeque<String> receivedMessages = new ArrayDeque<>();
 
@@ -43,48 +52,52 @@ public class SimpleSysoutHandlerTest {
         return result;
     }
 
-    private static void fillTestData(TaskStorage taskStorage) {
-        getTestTasks().forEach(taskStorage::addTask);
+    private static void fillTestData(TaskService taskService) {
+        getTestTasks().forEach(taskService::add);
     }
 
     @Test
     public void handleReadable() throws IOException {
         Assert.assertFalse(receivedMessages.isEmpty());
         while (!receivedMessages.isEmpty()) {
-            simpleSysoutHandler.handleReadable(
+            simpleHandler.handleReadable(
                     mockSelectorFactory.getSelector(),
                     mockSelectorFactory.getServerSocket(),
                     MockSelectorFactory.getReadableKey()
             );
         }
         Assert.assertTrue(receivedMessages.isEmpty());
-        //TODO: implement after logic for storing results
+        Assert.assertEquals(TASK_NUMBER, getSizeOfIterator(resultPersistence.getUriIterator()));
     }
 
     @Test
     public void handleWritable() throws IOException {
-        Assert.assertTrue(!taskStorage.isEmpty(TaskStatus.NOT_STARTED));
+        Assert.assertTrue(!taskService.isEmpty(TaskStatus.NOT_STARTED));
         while (!taskSupplier.isEmpty()) {
-            simpleSysoutHandler.handleWritable(
+            simpleHandler.handleWritable(
                     mockSelectorFactory.getSelector(),
                     mockSelectorFactory.getServerSocket(),
                     MockSelectorFactory.getReadableKey()
             );
         }
-        Assert.assertTrue(taskStorage.isEmpty(TaskStatus.NOT_STARTED));
+        Assert.assertTrue(taskService.isEmpty(TaskStatus.NOT_STARTED));
         Assert.assertEquals(TASK_NUMBER, sendedMessages.size());
     }
 
     @Before
     public void init() {
         TaskPersistenceLayer taskPersistenceLayer = new InMemoryTaskPersistence();
-        taskStorage = new TaskStorageImplementation(taskPersistenceLayer);
-        fillTestData(taskStorage);
-        taskSupplier = new TaskSupplier(taskStorage);
+        TaskDao taskDao = new TaskDao(taskPersistenceLayer);
+        taskService = new TaskService(taskDao);
+        fillTestData(taskService);
+        resultPersistence = new InMemoryPersistence<>();
+        resultService = new ResultService(new ResultDao(resultPersistence));
+        taskSupplier = new TaskSupplier(taskService);
         messageMarshaller = new MessageMarshaller(new IdOnlyTaskMarshaller(), new ResultMarshaller());
         fillTestMessages(sendedMessages, receivedMessages);
-        simpleSysoutHandler = new SimpleSysoutHandler(
+        simpleHandler = new SimpleHandler(
                 taskSupplier,
+                resultService,
                 new TranceiverMock(messageMarshaller, sendedMessages, receivedMessages),
                 messageMarshaller);
     }
@@ -93,7 +106,17 @@ public class SimpleSysoutHandlerTest {
         sendedMessages.clear();
         receivedMessages.clear();
         getTestTasks().stream()
-                .map(t -> messageMarshaller.marshall(new Message(new Result(t.getUri(), Collections.EMPTY_MAP), FlowControl.GETNEXTTASK)))
+                .map(t -> messageMarshaller.marshall(new Message(new Result(new ResultUri(), t.getUri(), Collections.EMPTY_MAP), FlowControl.GETNEXTTASK)))
                 .forEach(receivedMessages::add);
+    }
+
+    private int getSizeOfIterator(Iterator<?> iterator) {
+        Assert.assertNotNull(iterator);
+        int count = 0;
+        while (iterator.hasNext()) {
+            iterator.next();
+            count++;
+        }
+        return count;
     }
 }

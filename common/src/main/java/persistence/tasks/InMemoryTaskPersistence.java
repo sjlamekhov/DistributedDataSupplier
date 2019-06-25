@@ -1,4 +1,4 @@
-package distributeddatasupplier.server.persistence;
+package persistence.tasks;
 
 import objects.Task;
 import objects.TaskStatus;
@@ -53,6 +53,11 @@ public class InMemoryTaskPersistence implements TaskPersistenceLayer {
     @Override
     public void deleteObject(TaskUri uri) {
         tasks.remove(uri);
+    }
+
+    @Override
+    public Iterator<TaskUri> getUriIterator() {
+        return tasks.keySet().iterator();
     }
 
     @Override

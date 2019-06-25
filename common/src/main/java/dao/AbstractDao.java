@@ -6,11 +6,11 @@ import persistence.PersistenceLayer;
 
 import java.util.Collection;
 
-public abstract class AbstractDao<T extends AbstractObject, U extends AbstractObjectUri> {
+public abstract class AbstractDao<U extends AbstractObjectUri, T extends AbstractObject> {
 
-    protected final PersistenceLayer persistenceLayer;
+    protected final PersistenceLayer<U, T> persistenceLayer;
 
-    public AbstractDao(PersistenceLayer persistenceLayer) {
+    public AbstractDao(PersistenceLayer<U, T> persistenceLayer) {
         this.persistenceLayer = persistenceLayer;
     }
 

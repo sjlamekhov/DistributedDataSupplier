@@ -1,13 +1,19 @@
 package distributeddatasupplier.server;
 
 import configuration.ConfigurationService;
-import distributeddatasupplier.server.network.handlers.SimpleSysoutHandler;
+import dao.ResultDao;
+import dao.TaskDao;
+import distributeddatasupplier.server.network.handlers.SimpleHandler;
 import distributeddatasupplier.server.network.messageTransceiver.NetworkTransceiver;
 import distributeddatasupplier.server.network.selectorfactory.NetworkSelectorFactory;
 import distributeddatasupplier.server.network.selectorfactory.SelectorFactory;
-import distributeddatasupplier.server.persistence.InMemoryTaskPersistence;
-import distributeddatasupplier.server.persistence.TaskPersistenceLayer;
-import distributeddatasupplier.server.storage.TaskStorageImplementation;
+import distributeddatasupplier.server.services.ResultService;
+import objects.Result;
+import objects.ResultUri;
+import persistence.InMemoryPersistence;
+import persistence.tasks.InMemoryTaskPersistence;
+import persistence.tasks.TaskPersistenceLayer;
+import distributeddatasupplier.server.services.TaskService;
 import distributeddatasupplier.server.suppliers.TaskSupplier;
 import marshallers.MessageMarshaller;
 import marshallers.ResultMarshaller;
@@ -27,7 +33,9 @@ public class ServerApplication {
         System.out.println(String.format("host=%s, port=%s",
                 configurationService.getHost(), configurationService.getPort()));
         TaskPersistenceLayer taskPersistenceLayer = new InMemoryTaskPersistence();
-        TaskSupplier taskSupplier = new TaskSupplier(new TaskStorageImplementation(taskPersistenceLayer));
+        TaskDao taskDao = new TaskDao(taskPersistenceLayer);
+        TaskSupplier taskSupplier = new TaskSupplier(new TaskService(taskDao));
+        ResultService resultService = new ResultService(new ResultDao(new InMemoryPersistence<>()));
         MessageMarshaller messageMarshaller = new MessageMarshaller(
                 new IdOnlyTaskMarshaller(), new ResultMarshaller());
         for (int i = 0; i < 32; i++) {
@@ -39,7 +47,10 @@ public class ServerApplication {
                 configurationService.getHost(),
                 configurationService.getPort());
         ServerLoop serverLoop = new ServerLoop(
-                new SimpleSysoutHandler(taskSupplier, new NetworkTransceiver(), messageMarshaller),
+                new SimpleHandler(taskSupplier,
+                        resultService,
+                        new NetworkTransceiver(),
+                        messageMarshaller),
                 selectorFactory.getSelector(),
                 selectorFactory.getServerSocket(),
                 configurationService.getMaxExecutionTime()
