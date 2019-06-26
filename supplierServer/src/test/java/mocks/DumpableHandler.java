@@ -42,12 +42,12 @@ public class DumpableHandler implements Handler {
     }
 
     @Override
-    public void handleAcceptable(Selector selector, ServerSocketChannel serverSocket, SelectionKey key) throws IOException {
+    public void handleAcceptable(String tenantId, Selector selector, ServerSocketChannel serverSocket, SelectionKey key) throws IOException {
         SelectorUtils.register(selector, serverSocket, SelectionKey.OP_WRITE);
     }
 
     @Override
-    public void handleReadable(Selector selector, ServerSocketChannel serverSocket, SelectionKey key) throws IOException {
+    public void handleReadable(String tenantId, Selector selector, ServerSocketChannel serverSocket, SelectionKey key) throws IOException {
         String message = transceiver.getMessage(key);
         if (!message.isEmpty()) {
             messagesFromClient.add(message);
@@ -57,8 +57,8 @@ public class DumpableHandler implements Handler {
     }
 
     @Override
-    public void handleWritable(Selector selector, ServerSocketChannel serverSocket, SelectionKey key) throws IOException {
-        String message = messageMarshaller.marshall(new Message(taskSupplier.getTask(), FlowControl.DUMMY));
+    public void handleWritable(String tenantId, Selector selector, ServerSocketChannel serverSocket, SelectionKey key) throws IOException {
+        String message = messageMarshaller.marshall(new Message(taskSupplier.getTask(tenantId), FlowControl.DUMMY));
         transceiver.sendMessage(key, message);
         messagesFromServer.add(message);
         SelectorUtils.prepareForRead(selector, key);

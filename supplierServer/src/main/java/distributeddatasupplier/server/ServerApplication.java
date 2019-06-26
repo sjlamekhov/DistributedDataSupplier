@@ -1,6 +1,6 @@
 package distributeddatasupplier.server;
 
-import configuration.ConfigurationService;
+import dao.DaoFactory;
 import dao.ResultDao;
 import dao.TaskDao;
 import distributeddatasupplier.server.network.handlers.SimpleHandler;
@@ -8,8 +8,9 @@ import distributeddatasupplier.server.network.messageTransceiver.NetworkTranscei
 import distributeddatasupplier.server.network.selectorfactory.NetworkSelectorFactory;
 import distributeddatasupplier.server.network.selectorfactory.SelectorFactory;
 import distributeddatasupplier.server.services.ResultService;
-import objects.Result;
-import objects.ResultUri;
+import configuration.ServerConfigurationService;
+import marshallers.TaskUriMarshaller;
+import objects.TaskUri;
 import persistence.InMemoryPersistence;
 import persistence.tasks.InMemoryTaskPersistence;
 import persistence.tasks.TaskPersistenceLayer;
@@ -22,24 +23,23 @@ import marshallers.IdOnlyTaskMarshaller;
 
 import java.io.IOException;
 import java.util.Collections;
-import java.util.UUID;
 
 public class ServerApplication {
+
+    private static final String tenantId = "tenantId";
 
     //demo
     public static void main(String[] args) throws IOException {
         System.out.println("supplierServer started");
-        ConfigurationService configurationService = new ConfigurationService();
+        ServerConfigurationService configurationService = ServerConfigurationService.buildServerConfiguration();
         System.out.println(String.format("host=%s, port=%s",
                 configurationService.getHost(), configurationService.getPort()));
-        TaskPersistenceLayer taskPersistenceLayer = new InMemoryTaskPersistence();
-        TaskDao taskDao = new TaskDao(taskPersistenceLayer);
-        TaskSupplier taskSupplier = new TaskSupplier(new TaskService(taskDao));
+        TaskSupplier taskSupplier = new TaskSupplier(new TaskService(DaoFactory.buildTaskDao(configurationService)));
         ResultService resultService = new ResultService(new ResultDao(new InMemoryPersistence<>()));
         MessageMarshaller messageMarshaller = new MessageMarshaller(
-                new IdOnlyTaskMarshaller(), new ResultMarshaller());
+                new IdOnlyTaskMarshaller(), new ResultMarshaller(tenantId, new TaskUriMarshaller()));
         for (int i = 0; i < 32; i++) {
-            taskSupplier.addTask(new Task(UUID.randomUUID().toString(), Collections.emptyMap()));
+            taskSupplier.addTask(new Task(new TaskUri(tenantId), Collections.emptyMap()));
         }
         System.out.println("configurationService.getMaxExecutionTime():\t"
                 + configurationService.getMaxExecutionTime());
@@ -53,7 +53,8 @@ public class ServerApplication {
                         messageMarshaller),
                 selectorFactory.getSelector(),
                 selectorFactory.getServerSocket(),
-                configurationService.getMaxExecutionTime()
+                configurationService.getMaxExecutionTime(),
+                configurationService.getDaoConfigurations().keySet()
         );
         //TODO: start in separate thread
         serverLoop.start();

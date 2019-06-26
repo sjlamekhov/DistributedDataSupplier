@@ -5,17 +5,24 @@ import dao.UriGenerator;
 public abstract class AbstractObjectUri {
 
     protected final String id;
+    protected final String tenantId;
 
-    public AbstractObjectUri() {
+    public AbstractObjectUri(String tenantId) {
         this.id = UriGenerator.generateId();
+        this.tenantId = tenantId;
     }
 
-    public AbstractObjectUri(String id) {
+    public AbstractObjectUri(String id, String tenantId) {
         this.id = id;
+        this.tenantId = tenantId;
     }
 
     public String getId() {
         return id;
+    }
+
+    public String getTenantId() {
+        return tenantId;
     }
 
     @Override

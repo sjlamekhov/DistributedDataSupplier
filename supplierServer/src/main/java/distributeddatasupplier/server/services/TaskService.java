@@ -1,5 +1,6 @@
 package distributeddatasupplier.server.services;
 
+import dao.CompositeTaskDao;
 import dao.TaskDao;
 import persistence.tasks.TaskPersistenceLayer;
 import objects.Task;
@@ -10,14 +11,14 @@ import java.util.*;
 
 public class TaskService {
 
-    private final TaskDao taskDao;
+    private final CompositeTaskDao taskDao;
 
-    public TaskService(TaskDao taskDao) {
+    public TaskService(CompositeTaskDao taskDao) {
         this.taskDao = taskDao;
     }
 
-    public Task pollAnyTask() {
-        Collection<Task> tasks = taskDao.getTasksByStatus(TaskStatus.NOT_STARTED, 1);
+    public Task pollAnyTask(String tenantId) {
+        Collection<Task> tasks = taskDao.getTasksByStatus(tenantId, TaskStatus.NOT_STARTED, 1);
         if (tasks.isEmpty()) {
             return Task.EMPTY_TASK;
         } else {
@@ -41,8 +42,8 @@ public class TaskService {
         taskDao.deleteObject(taskUri);
     }
 
-    public boolean isEmpty(TaskStatus taskStatus) {
-        return !taskDao.hasTasksWithStatus(taskStatus);
+    public boolean isEmpty(String tenantId, TaskStatus taskStatus) {
+        return !taskDao.hasTasksWithStatus(tenantId,  taskStatus);
     }
 
     public void markTaskAsFinished(TaskUri taskUri) {

@@ -1,9 +1,11 @@
 package distributeddatasupplier.server.network.handlers;
 
+import dao.CompositeTaskDao;
 import dao.ResultDao;
 import dao.TaskDao;
 import distributeddatasupplier.server.services.ResultService;
-import objects.ResultUri;
+import marshallers.TaskUriMarshaller;
+import objects.*;
 import persistence.InMemoryPersistence;
 import persistence.tasks.InMemoryTaskPersistence;
 import persistence.tasks.TaskPersistenceLayer;
@@ -16,9 +18,6 @@ import messaging.FlowControl;
 import messaging.Message;
 import mock.MockSelectorFactory;
 import mocks.TranceiverMock;
-import objects.Result;
-import objects.Task;
-import objects.TaskStatus;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -27,6 +26,8 @@ import java.io.IOException;
 import java.util.*;
 
 public class SimpleHandlerTest {
+
+    protected static final String tenantId = "testTenantId";
 
     private MockSelectorFactory mockSelectorFactory = new MockSelectorFactory();
     private SimpleHandler simpleHandler = null;
@@ -47,7 +48,7 @@ public class SimpleHandlerTest {
     private static List<Task> getTestTasks() {
         List<Task> result = new ArrayList<>();
         for (int i = 0; i < TASK_NUMBER; i++) {
-            result.add(new Task(TASK_PREFIX + i, Collections.emptyMap()));
+            result.add(new Task(new TaskUri(TASK_PREFIX + i, tenantId), Collections.emptyMap()));
         }
         return result;
     }
@@ -61,6 +62,7 @@ public class SimpleHandlerTest {
         Assert.assertFalse(receivedMessages.isEmpty());
         while (!receivedMessages.isEmpty()) {
             simpleHandler.handleReadable(
+                    tenantId,
                     mockSelectorFactory.getSelector(),
                     mockSelectorFactory.getServerSocket(),
                     MockSelectorFactory.getReadableKey()
@@ -72,28 +74,31 @@ public class SimpleHandlerTest {
 
     @Test
     public void handleWritable() throws IOException {
-        Assert.assertTrue(!taskService.isEmpty(TaskStatus.NOT_STARTED));
-        while (!taskSupplier.isEmpty()) {
+        Assert.assertTrue(!taskService.isEmpty(tenantId, TaskStatus.NOT_STARTED));
+        while (!taskSupplier.isEmpty(tenantId)) {
             simpleHandler.handleWritable(
+                    tenantId,
                     mockSelectorFactory.getSelector(),
                     mockSelectorFactory.getServerSocket(),
                     MockSelectorFactory.getReadableKey()
             );
         }
-        Assert.assertTrue(taskService.isEmpty(TaskStatus.NOT_STARTED));
+        Assert.assertTrue(taskService.isEmpty(tenantId, TaskStatus.NOT_STARTED));
         Assert.assertEquals(TASK_NUMBER, sendedMessages.size());
     }
 
     @Before
     public void init() {
         TaskPersistenceLayer taskPersistenceLayer = new InMemoryTaskPersistence();
-        TaskDao taskDao = new TaskDao(taskPersistenceLayer);
-        taskService = new TaskService(taskDao);
+        CompositeTaskDao compositeTaskDao = new CompositeTaskDao();
+        compositeTaskDao.addDao(tenantId, new TaskDao(taskPersistenceLayer));
+        taskService = new TaskService(compositeTaskDao);
         fillTestData(taskService);
         resultPersistence = new InMemoryPersistence<>();
         resultService = new ResultService(new ResultDao(resultPersistence));
         taskSupplier = new TaskSupplier(taskService);
-        messageMarshaller = new MessageMarshaller(new IdOnlyTaskMarshaller(), new ResultMarshaller());
+        messageMarshaller = new MessageMarshaller(new IdOnlyTaskMarshaller(),
+                new ResultMarshaller(tenantId, new TaskUriMarshaller()));
         fillTestMessages(sendedMessages, receivedMessages);
         simpleHandler = new SimpleHandler(
                 taskSupplier,
@@ -106,7 +111,7 @@ public class SimpleHandlerTest {
         sendedMessages.clear();
         receivedMessages.clear();
         getTestTasks().stream()
-                .map(t -> messageMarshaller.marshall(new Message(new Result(new ResultUri(), t.getUri(), Collections.EMPTY_MAP), FlowControl.GETNEXTTASK)))
+                .map(t -> messageMarshaller.marshall(new Message(new Result(new ResultUri(tenantId), t.getUri(), Collections.EMPTY_MAP), FlowControl.GETNEXTTASK)))
                 .forEach(receivedMessages::add);
     }
 

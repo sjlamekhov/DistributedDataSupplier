@@ -8,6 +8,7 @@ import messaging.FlowControl;
 import messaging.Message;
 import objects.Result;
 import distributeddatasupplier.server.suppliers.TaskSupplier;
+import objects.Task;
 
 import java.io.IOException;
 import java.nio.channels.SelectionKey;
@@ -32,12 +33,12 @@ public class SimpleHandler implements Handler {
     }
 
     @Override
-    public void handleAcceptable(Selector selector, ServerSocketChannel serverSocket, SelectionKey key) throws IOException {
+    public void handleAcceptable(String tenantId, Selector selector, ServerSocketChannel serverSocket, SelectionKey key) throws IOException {
         SelectorUtils.register(selector, serverSocket, SelectionKey.OP_WRITE);
     }
 
     @Override
-    public void handleReadable(Selector selector, ServerSocketChannel serverSocket, SelectionKey key) throws IOException {
+    public void handleReadable(String tenantId, Selector selector, ServerSocketChannel serverSocket, SelectionKey key) throws IOException {
         String message = transceiver.getMessage(key);
         if (!message.isEmpty()) {
             Message messageObject = messageMarshaller.unmarshall(message);
@@ -62,8 +63,10 @@ public class SimpleHandler implements Handler {
     }
 
     @Override
-    public void handleWritable(Selector selector, ServerSocketChannel serverSocket, SelectionKey key) throws IOException {
-        transceiver.sendMessage(key, messageMarshaller.marshall(new Message(taskSupplier.getTask(), FlowControl.DUMMY)));
+    public void handleWritable(String tenantId, Selector selector, ServerSocketChannel serverSocket, SelectionKey key) throws IOException {
+        Task task = taskSupplier.getTask(tenantId);
+        System.out.println("task:\t" + task);
+        transceiver.sendMessage(key, messageMarshaller.marshall(new Message(task, FlowControl.DUMMY)));
         SelectorUtils.prepareForRead(selector, key);
     }
 

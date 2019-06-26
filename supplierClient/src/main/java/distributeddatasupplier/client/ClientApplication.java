@@ -1,27 +1,30 @@
 package distributeddatasupplier.client;
 
-import configuration.ConfigurationService;
+import distributeddatasupplier.client.configuration.ClientConfigurationService;
 import distributeddatasupplier.client.processing.AppenderTaskProcessor;
 import distributeddatasupplier.client.processing.TaskProcessor;
-import marshallers.MessageMarshaller;
-import marshallers.ResultMarshaller;
+import marshallers.*;
 import messaging.FlowControl;
 import messaging.Message;
 import objects.Result;
 import objects.Task;
-import marshallers.IdOnlyTaskMarshaller;
+import objects.TaskUri;
 
 import java.io.IOException;
 import java.util.Objects;
 
 public class ClientApplication {
+
     public static void main(String[] args) throws IOException {
         System.out.println("supplierClient started");
 
-        ConfigurationService configurationService = new ConfigurationService();
+        ClientConfigurationService configurationService = new ClientConfigurationService();
+        final String tenantId = configurationService.getTenantId();
         TaskProcessor<Task, Result> taskProcessor = new AppenderTaskProcessor();
+        Marshaller<Task> taskMarshaller = new IdOnlyTaskMarshaller();
+        Marshaller<TaskUri> taskUriMarshaller = new TaskUriMarshaller();
         MessageMarshaller messageMarshaller = new MessageMarshaller(
-                new IdOnlyTaskMarshaller(), new ResultMarshaller()
+                taskMarshaller, new ResultMarshaller(tenantId, taskUriMarshaller)
         );
         Client client = new Client(configurationService.getHost(), configurationService.getPort());
         if (!client.isStarted()) {

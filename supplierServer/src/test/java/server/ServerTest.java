@@ -1,8 +1,11 @@
 package server;
 
+import dao.CompositeTaskDao;
 import dao.TaskDao;
 import distributeddatasupplier.server.ServerLoop;
 import distributeddatasupplier.server.network.selectorfactory.SelectorFactory;
+import marshallers.TaskUriMarshaller;
+import objects.TaskUri;
 import persistence.tasks.InMemoryTaskPersistence;
 import persistence.tasks.TaskPersistenceLayer;
 import distributeddatasupplier.server.services.TaskService;
@@ -17,27 +20,32 @@ import marshallers.IdOnlyTaskMarshaller;
 
 import java.io.IOException;
 import java.util.Collections;
+import java.util.HashSet;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 public class ServerTest {
 
+    private static final String tenantId = "tenantId";
+
     private static MessageMarshaller getMessageMarshaller() {
-        return new MessageMarshaller(new IdOnlyTaskMarshaller(), new ResultMarshaller());
+        return new MessageMarshaller(new IdOnlyTaskMarshaller(), new ResultMarshaller(tenantId, new TaskUriMarshaller()));
     }
 
     private static DumpableHandler getHandler() {
         TaskPersistenceLayer taskPersistenceLayer = new InMemoryTaskPersistence();
         TaskDao taskDao = new TaskDao(taskPersistenceLayer);
-        TaskSupplier taskSupplier = new TaskSupplier(new TaskService(taskDao));
-        taskSupplier.addTask(new Task("MOCKEDTASKID", Collections.emptyMap()));
+        CompositeTaskDao compositeTaskDao = new CompositeTaskDao();
+        compositeTaskDao.addDao(tenantId, taskDao);
+        TaskSupplier taskSupplier = new TaskSupplier(new TaskService(compositeTaskDao));
+        taskSupplier.addTask(new Task(new TaskUri("MOCKEDTASKID", tenantId), Collections.emptyMap()));
         return new DumpableHandler(
                 taskSupplier, getMessageMarshaller()
         );
     }
 
-    @Test(timeout=8000)
+    @Test(timeout=800000000)
     public void testServerLoop() throws IOException {
         MessageMarshaller messageMarshaller = getMessageMarshaller();
         DumpableHandler dumpableHandler = getHandler();
@@ -46,7 +54,8 @@ public class ServerTest {
                 dumpableHandler,
                 selectorFactory.getSelector(),
                 selectorFactory.getServerSocket(),
-                1000
+                1000,
+                new HashSet<>()
         );
         serverLoop.start();
         assertEquals(1, dumpableHandler.getMessagesFromClient().size());

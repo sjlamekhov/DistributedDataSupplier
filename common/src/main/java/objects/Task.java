@@ -8,8 +8,8 @@ public class Task extends AbstractObject {
     private TaskStatus taskStatus;
     private final Map<String, String> taskProperties;
 
-    public Task(String taskId, Map<String, String> taskProperties) {
-        super(new TaskUri(taskId));
+    public Task(TaskUri taskUri, Map<String, String> taskProperties) {
+        super(taskUri);
         taskStatus = TaskStatus.NOT_STARTED;
         this.taskProperties = taskProperties;
     }
@@ -30,5 +30,5 @@ public class Task extends AbstractObject {
         return Collections.unmodifiableMap(taskProperties);
     }
 
-    public static Task EMPTY_TASK = new Task("EMPTY", Collections.emptyMap());
+    public static Task EMPTY_TASK = new Task(TaskUri.EMPTY, Collections.emptyMap());
 }

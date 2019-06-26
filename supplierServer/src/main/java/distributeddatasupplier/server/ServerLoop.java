@@ -14,6 +14,8 @@ public class ServerLoop {
 
     private boolean isStopped;
     private final long maxExecutionTime;
+    private final Set<String> tenants;
+    private static final String tenantId = "tenantId";  //stub, to be implemented
 
     private final Handler handler;
 
@@ -25,12 +27,14 @@ public class ServerLoop {
     public ServerLoop(Handler handler,
                       Selector selector,
                       ServerSocketChannel serverSocket,
-                      long maxExecutionTime) {
+                      long maxExecutionTime,
+                      Set<String> tenants) {
         this.isStopped = false;
         this.handler = handler;
         this.selector = selector;
         this.serverSocket = serverSocket;
         this.maxExecutionTime = maxExecutionTime;
+        this.tenants = tenants;
     }
 
     public void start() throws IOException {
@@ -49,13 +53,13 @@ public class ServerLoop {
 
                 try {
                     if (key.isAcceptable()) {
-                        handler.handleAcceptable(selector, serverSocket, null);
+                        handler.handleAcceptable(tenantId, selector, serverSocket, null);
                         handledAcceptable++;
                     } else if (key.isWritable()) {
-                        handler.handleWritable(selector, serverSocket, key);
+                        handler.handleWritable(tenantId, selector, serverSocket, key);
                         handledWritable++;
                     } else if (key.isReadable()) {
-                        handler.handleReadable(selector, serverSocket, key);
+                        handler.handleReadable(tenantId, selector, serverSocket, key);
                         handledReadable++;
                     }
                     numberOfReceivedRequests++;

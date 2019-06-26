@@ -13,16 +13,16 @@ public class TaskSupplier {
         this.taskService = taskService;
     }
 
-    public Task getTask() {
-        return taskService.pollAnyTask();
+    public Task getTask(String tenantId) {
+        return taskService.pollAnyTask(tenantId);
     }
 
     public void addTask(Task task) {
         taskService.add(task);
     }
 
-    public boolean isEmpty() {
-        return taskService.isEmpty(TaskStatus.NOT_STARTED);
+    public boolean isEmpty(String tenantId) {
+        return taskService.isEmpty(tenantId, TaskStatus.NOT_STARTED);
     }
 
     //for backpressure

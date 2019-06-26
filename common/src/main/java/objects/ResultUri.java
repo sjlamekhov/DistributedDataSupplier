@@ -2,12 +2,12 @@ package objects;
 
 public class ResultUri extends AbstractObjectUri {
 
-    public ResultUri() {
-        super();
+    public ResultUri(String tenantId) {
+        super(tenantId);
     }
 
-    public ResultUri(String id) {
-        super(id);
+    public ResultUri(String id, String tenantId) {
+        super(id, tenantId);
     }
 
 }

@@ -6,4 +6,10 @@ public class TaskUri extends AbstractObjectUri {
         super(taskId);
     }
 
+    public TaskUri(String id, String tenantId) {
+        super(id, tenantId);
+    }
+
+    public static TaskUri EMPTY = new TaskUri("EMPTY", null);
+
 }
