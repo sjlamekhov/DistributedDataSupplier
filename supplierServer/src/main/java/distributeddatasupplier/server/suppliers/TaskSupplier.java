@@ -13,7 +13,7 @@ public class TaskSupplier {
         this.taskService = taskService;
     }
 
-    public Task getTask(String tenantId) {
+    public Task pollTask(String tenantId) {
         return taskService.pollAnyTask(tenantId);
     }
 

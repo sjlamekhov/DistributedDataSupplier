@@ -14,18 +14,23 @@ import java.io.IOException;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
+import java.util.Objects;
+import java.util.Set;
 
 public class SimpleHandler implements Handler {
 
+    private final Set<String> tenantIds;
     private final TaskSupplier taskSupplier;
     private final ResultService resultService;
     private final Transceiver transceiver;
     private final MessageMarshaller messageMarshaller;
 
-    public SimpleHandler(TaskSupplier taskSupplier,
+    public SimpleHandler(Set<String> tenantIds,
+                         TaskSupplier taskSupplier,
                          ResultService resultService,
                          Transceiver transceiver,
                          MessageMarshaller messageMarshaller) {
+        this.tenantIds = tenantIds;
         this.taskSupplier = taskSupplier;
         this.resultService = resultService;
         this.transceiver = transceiver;
@@ -33,12 +38,12 @@ public class SimpleHandler implements Handler {
     }
 
     @Override
-    public void handleAcceptable(String tenantId, Selector selector, ServerSocketChannel serverSocket, SelectionKey key) throws IOException {
+    public void handleAcceptable(Selector selector, ServerSocketChannel serverSocket, SelectionKey key) throws IOException {
         SelectorUtils.register(selector, serverSocket, SelectionKey.OP_WRITE);
     }
 
     @Override
-    public void handleReadable(String tenantId, Selector selector, ServerSocketChannel serverSocket, SelectionKey key) throws IOException {
+    public void handleReadable(Selector selector, ServerSocketChannel serverSocket, SelectionKey key) throws IOException {
         String message = transceiver.getMessage(key);
         if (!message.isEmpty()) {
             Message messageObject = messageMarshaller.unmarshall(message);
@@ -63,9 +68,14 @@ public class SimpleHandler implements Handler {
     }
 
     @Override
-    public void handleWritable(String tenantId, Selector selector, ServerSocketChannel serverSocket, SelectionKey key) throws IOException {
-        Task task = taskSupplier.getTask(tenantId);
-        System.out.println("task:\t" + task);
+    public void handleWritable(Selector selector, ServerSocketChannel serverSocket, SelectionKey key) throws IOException {
+        Task task = null;
+        for (String tenantId : tenantIds) {
+            task = taskSupplier.pollTask(tenantId);
+            if (!Objects.equals(task, Task.EMPTY_TASK)) {
+                break;
+            }
+        }
         transceiver.sendMessage(key, messageMarshaller.marshall(new Message(task, FlowControl.DUMMY)));
         SelectorUtils.prepareForRead(selector, key);
     }

@@ -62,7 +62,6 @@ public class SimpleHandlerTest {
         Assert.assertFalse(receivedMessages.isEmpty());
         while (!receivedMessages.isEmpty()) {
             simpleHandler.handleReadable(
-                    tenantId,
                     mockSelectorFactory.getSelector(),
                     mockSelectorFactory.getServerSocket(),
                     MockSelectorFactory.getReadableKey()
@@ -77,7 +76,6 @@ public class SimpleHandlerTest {
         Assert.assertTrue(!taskService.isEmpty(tenantId, TaskStatus.NOT_STARTED));
         while (!taskSupplier.isEmpty(tenantId)) {
             simpleHandler.handleWritable(
-                    tenantId,
                     mockSelectorFactory.getSelector(),
                     mockSelectorFactory.getServerSocket(),
                     MockSelectorFactory.getReadableKey()
@@ -101,6 +99,7 @@ public class SimpleHandlerTest {
                 new ResultMarshaller(tenantId, new TaskUriMarshaller()));
         fillTestMessages(sendedMessages, receivedMessages);
         simpleHandler = new SimpleHandler(
+                Collections.singleton(tenantId),
                 taskSupplier,
                 resultService,
                 new TranceiverMock(messageMarshaller, sendedMessages, receivedMessages),

@@ -40,8 +40,7 @@ public class ServerTest {
         compositeTaskDao.addDao(tenantId, taskDao);
         TaskSupplier taskSupplier = new TaskSupplier(new TaskService(compositeTaskDao));
         taskSupplier.addTask(new Task(new TaskUri("MOCKEDTASKID", tenantId), Collections.emptyMap()));
-        return new DumpableHandler(
-                taskSupplier, getMessageMarshaller()
+        return new DumpableHandler(tenantId, taskSupplier, getMessageMarshaller()
         );
     }
 

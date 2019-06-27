@@ -53,13 +53,13 @@ public class ServerLoop {
 
                 try {
                     if (key.isAcceptable()) {
-                        handler.handleAcceptable(tenantId, selector, serverSocket, null);
+                        handler.handleAcceptable(selector, serverSocket, null);
                         handledAcceptable++;
                     } else if (key.isWritable()) {
-                        handler.handleWritable(tenantId, selector, serverSocket, key);
+                        handler.handleWritable(selector, serverSocket, key);
                         handledWritable++;
                     } else if (key.isReadable()) {
-                        handler.handleReadable(tenantId, selector, serverSocket, key);
+                        handler.handleReadable(selector, serverSocket, key);
                         handledReadable++;
                     }
                     numberOfReceivedRequests++;

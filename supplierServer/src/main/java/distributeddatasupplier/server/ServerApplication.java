@@ -47,7 +47,9 @@ public class ServerApplication {
                 configurationService.getHost(),
                 configurationService.getPort());
         ServerLoop serverLoop = new ServerLoop(
-                new SimpleHandler(taskSupplier,
+                new SimpleHandler(
+                        Collections.singleton(tenantId),
+                        taskSupplier,
                         resultService,
                         new NetworkTransceiver(),
                         messageMarshaller),

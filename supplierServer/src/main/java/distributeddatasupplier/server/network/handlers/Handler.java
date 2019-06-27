@@ -7,8 +7,8 @@ import java.nio.channels.ServerSocketChannel;
 
 public interface Handler {
 
-    void handleAcceptable(String tenantId, Selector selector, ServerSocketChannel serverSocket, SelectionKey key) throws IOException;
-    void handleReadable(String tenantId, Selector selector, ServerSocketChannel serverSocket, SelectionKey key) throws IOException;
-    void handleWritable(String tenantId, Selector selector, ServerSocketChannel serverSocket, SelectionKey key) throws IOException;
+    void handleAcceptable(Selector selector, ServerSocketChannel serverSocket, SelectionKey key) throws IOException;
+    void handleReadable(Selector selector, ServerSocketChannel serverSocket, SelectionKey key) throws IOException;
+    void handleWritable(Selector selector, ServerSocketChannel serverSocket, SelectionKey key) throws IOException;
 
 }
