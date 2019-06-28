@@ -1,5 +1,6 @@
 package distributeddatasupplier.server;
 
+import configuration.ConfigProvider;
 import dao.DaoFactory;
 import dao.ResultDao;
 import dao.TaskDao;
@@ -31,7 +32,9 @@ public class ServerApplication {
     //demo
     public static void main(String[] args) throws IOException {
         System.out.println("supplierServer started");
-        ServerConfigurationService configurationService = ServerConfigurationService.buildServerConfiguration();
+        ServerConfigurationService configurationService = ServerConfigurationService.buildServerConfiguration(
+                ConfigProvider.getProperties()
+        );
         System.out.println(String.format("host=%s, port=%s",
                 configurationService.getHost(), configurationService.getPort()));
         TaskSupplier taskSupplier = new TaskSupplier(new TaskService(DaoFactory.buildTaskDao(configurationService)));

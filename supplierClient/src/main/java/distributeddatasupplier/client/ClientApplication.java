@@ -1,5 +1,6 @@
 package distributeddatasupplier.client;
 
+import configuration.ConfigProvider;
 import distributeddatasupplier.client.configuration.ClientConfigurationService;
 import distributeddatasupplier.client.processing.AppenderTaskProcessor;
 import distributeddatasupplier.client.processing.TaskProcessor;
@@ -18,7 +19,9 @@ public class ClientApplication {
     public static void main(String[] args) throws IOException {
         System.out.println("supplierClient started");
 
-        ClientConfigurationService configurationService = new ClientConfigurationService();
+        ClientConfigurationService configurationService = new ClientConfigurationService(
+                ConfigProvider.getProperties()
+        );
         final String tenantId = configurationService.getTenantId();
         TaskProcessor<Task, Result> taskProcessor = new AppenderTaskProcessor();
         Marshaller<Task> taskMarshaller = new IdOnlyTaskMarshaller();

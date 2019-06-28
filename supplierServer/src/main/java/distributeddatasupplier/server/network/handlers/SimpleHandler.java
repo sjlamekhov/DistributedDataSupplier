@@ -3,6 +3,7 @@ package distributeddatasupplier.server.network.handlers;
 import distributeddatasupplier.server.network.SelectorUtils;
 import distributeddatasupplier.server.network.messageTransceiver.Transceiver;
 import distributeddatasupplier.server.services.ResultService;
+import marshallers.Marshaller;
 import marshallers.MessageMarshaller;
 import messaging.FlowControl;
 import messaging.Message;
@@ -23,13 +24,13 @@ public class SimpleHandler implements Handler {
     private final TaskSupplier taskSupplier;
     private final ResultService resultService;
     private final Transceiver transceiver;
-    private final MessageMarshaller messageMarshaller;
+    private final Marshaller<Message> messageMarshaller;
 
     public SimpleHandler(Set<String> tenantIds,
                          TaskSupplier taskSupplier,
                          ResultService resultService,
                          Transceiver transceiver,
-                         MessageMarshaller messageMarshaller) {
+                         Marshaller<Message> messageMarshaller) {
         this.tenantIds = tenantIds;
         this.taskSupplier = taskSupplier;
         this.resultService = resultService;

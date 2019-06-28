@@ -2,7 +2,6 @@ package distributeddatasupplier.server.services;
 
 import dao.CompositeTaskDao;
 import dao.TaskDao;
-import persistence.tasks.TaskPersistenceLayer;
 import objects.Task;
 import objects.TaskStatus;
 import objects.TaskUri;
@@ -11,9 +10,9 @@ import java.util.*;
 
 public class TaskService {
 
-    private final CompositeTaskDao taskDao;
+    private final TaskDao taskDao;
 
-    public TaskService(CompositeTaskDao taskDao) {
+    public TaskService(TaskDao taskDao) {
         this.taskDao = taskDao;
     }
 

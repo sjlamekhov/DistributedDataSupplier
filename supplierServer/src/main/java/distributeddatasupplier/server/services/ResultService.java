@@ -1,14 +1,15 @@
 package distributeddatasupplier.server.services;
 
+import dao.AbstractDao;
 import dao.ResultDao;
 import objects.Result;
 import objects.ResultUri;
 
 public class ResultService {
 
-    private final ResultDao resultDao;
+    private final AbstractDao<ResultUri, Result> resultDao;
 
-    public ResultService(ResultDao resultDao) {
+    public ResultService(AbstractDao<ResultUri, Result> resultDao) {
         this.resultDao = resultDao;
     }
 
@@ -17,7 +18,7 @@ public class ResultService {
     }
 
     public Result getByUri(ResultUri resultUri) {
-        return resultDao.getByUri(resultUri);
+        return (Result) resultDao.getByUri(resultUri);
     }
 
 }

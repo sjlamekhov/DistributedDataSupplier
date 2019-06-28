@@ -1,10 +1,9 @@
 package dao;
 
-import configuration.ConfigurationService;
 import configuration.DaoConfiguration;
 import configuration.ServerConfigurationService;
-import objects.Task;
-import objects.TaskUri;
+import objects.Result;
+import objects.ResultUri;
 import persistence.InMemoryPersistence;
 import persistence.PersistenceLayer;
 import persistence.tasks.InMemoryTaskPersistence;
@@ -36,4 +35,21 @@ public class DaoFactory {
         return compositeDao;
     }
 
+    public static CompositeDao<ResultUri, Result> buildResultDao(ServerConfigurationService serverConfigurationService) {
+        CompositeDao<ResultUri, Result> compositeDao = new CompositeDao<>();
+        Map<String, DaoConfiguration> daoConfigurations = serverConfigurationService.getDaoConfigurations();
+        for (Map.Entry<String, DaoConfiguration> daoConfigEntry : daoConfigurations.entrySet()) {
+            String tenantId = daoConfigEntry.getKey();
+            DaoConfiguration daoConfiguration = daoConfigEntry.getValue();
+            ResultDao resultDao = null;
+            if (Objects.equals(daoConfiguration.getValueByKey(DAO_TYPE), DAO_TYPE_INMEMORY)) {
+                PersistenceLayer<ResultUri, Result> resultPersistence = new InMemoryPersistence<>();
+                resultDao = new ResultDao(resultPersistence);
+            }
+            if (resultDao != null) {
+                compositeDao.addDao(tenantId, resultDao);
+            }
+        }
+        return compositeDao;
+    }
 }

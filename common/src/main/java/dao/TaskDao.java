@@ -39,7 +39,7 @@ public class TaskDao {
         persistenceLayer.deleteObject(uri);
     }
 
-    public Collection<Task> getTasksByStatus(TaskStatus taskStatus, int limit) {
+    public Collection<Task> getTasksByStatus(String tenantId, TaskStatus taskStatus, int limit) {
         return persistenceLayer.getTasksByStatus(taskStatus, limit);
     }
 
@@ -47,7 +47,7 @@ public class TaskDao {
         persistenceLayer.setTaskStatus(taskUri, taskStatus);
     }
 
-    public boolean hasTasksWithStatus(TaskStatus taskStatus) {
+    public boolean hasTasksWithStatus(String tenantId, TaskStatus taskStatus) {
         return persistenceLayer.hasTasksWithStatus(taskStatus);
     }
 }

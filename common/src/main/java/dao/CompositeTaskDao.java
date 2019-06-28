@@ -61,14 +61,17 @@ public class CompositeTaskDao extends TaskDao {
         getDaoInternal(tenantId).deleteObject(uri);
     }
 
+    @Override
     public boolean hasTasksWithStatus(String tenantId, TaskStatus taskStatus) {
-        return getDaoInternal(tenantId).hasTasksWithStatus(taskStatus);
+        return getDaoInternal(tenantId).hasTasksWithStatus(tenantId, taskStatus);
     }
 
+    @Override
     public Collection<Task> getTasksByStatus(String tenantId, TaskStatus taskStatus, int limit) {
-        return getDaoInternal(tenantId).getTasksByStatus(taskStatus, limit);
+        return getDaoInternal(tenantId).getTasksByStatus(tenantId, taskStatus, limit);
     }
 
+    @Override
     public void setTaskStatus(TaskUri taskUri, TaskStatus taskStatus) {
         getDaoInternal(Objects.requireNonNull(taskUri).getTenantId()).setTaskStatus(taskUri, taskStatus);
     }

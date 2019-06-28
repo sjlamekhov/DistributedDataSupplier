@@ -1,7 +1,6 @@
 package configuration;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static configuration.ConfigurationConstants.DAO_PREFIX;
 import static configuration.ConfigurationConstants.DAO_TYPE;
@@ -15,8 +14,8 @@ public class ServerConfigurationService extends ConfigurationService {
 
     private final Map<String, DaoConfiguration> daoConfigurations;
 
-    private ServerConfigurationService() {
-        super();
+    private ServerConfigurationService(Properties properties) {
+        super(properties);
         this.daoConfigurations = new HashMap<>();
     }
 
@@ -24,8 +23,12 @@ public class ServerConfigurationService extends ConfigurationService {
         return Collections.unmodifiableMap(daoConfigurations);
     }
 
-    public static ServerConfigurationService buildServerConfiguration() {
-        ServerConfigurationService serverConfigurationService = new ServerConfigurationService();
+    public Set<String> getTenantIds() {
+        return daoConfigurations.keySet();
+    }
+
+    public static ServerConfigurationService buildServerConfiguration(Properties properties) {
+        ServerConfigurationService serverConfigurationService = new ServerConfigurationService(properties);
         Set<String> tenantIds = new HashSet<>(Arrays.asList(serverConfigurationService
                 .properties.getProperty(TENANTS, TENANTS_SEPARATOR).split(",")));
         for (String tenantId : tenantIds) {

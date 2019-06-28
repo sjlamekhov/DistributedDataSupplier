@@ -6,8 +6,8 @@ public class ConfigurationService {
 
     protected final Properties properties;
 
-    public ConfigurationService() {
-        this.properties = ConfigProvider.getProperties();
+    public ConfigurationService(Properties properties) {
+        this.properties = properties;
     }
 
     public String getHost() {
