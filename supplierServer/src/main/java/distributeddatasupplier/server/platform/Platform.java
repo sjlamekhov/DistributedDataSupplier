@@ -6,6 +6,7 @@ import distributeddatasupplier.server.services.ResultService;
 import distributeddatasupplier.server.services.TaskService;
 import distributeddatasupplier.server.suppliers.TaskSupplier;
 import marshallers.Marshaller;
+import messaging.Message;
 import objects.Result;
 import objects.Task;
 
@@ -13,17 +14,19 @@ public class Platform {
 
     private final Marshaller<Task> taskMarshaller;
     private final Marshaller<Result> resultMarshaller;
+    private final Marshaller<Message> messageMarshaller;
     private final ResultService resultService;
     private final TaskService taskService;
     private final TaskSupplier taskSupplier;
     private final ServerConfigurationService serverConfigurationService;
     private final Handler handler;
 
-    private Platform(Marshaller<Task> taskMarshaller, Marshaller<Result> resultMarshaller,
+    private Platform(Marshaller<Task> taskMarshaller, Marshaller<Result> resultMarshaller, Marshaller<Message> messageMarshaller,
                      ResultService resultService, TaskService taskService, TaskSupplier taskSupplier,
                      ServerConfigurationService serverConfigurationService, Handler handler) {
         this.taskMarshaller = taskMarshaller;
         this.resultMarshaller = resultMarshaller;
+        this.messageMarshaller = messageMarshaller;
         this.resultService = resultService;
         this.taskService = taskService;
         this.taskSupplier = taskSupplier;
@@ -39,12 +42,20 @@ public class Platform {
         return resultMarshaller;
     }
 
+    public Marshaller<Message> getMessageMarshaller() {
+        return messageMarshaller;
+    }
+
     public ResultService getResultService() {
         return resultService;
     }
 
     public TaskService getTaskService() {
         return taskService;
+    }
+
+    public TaskSupplier getTaskSupplier() {
+        return taskSupplier;
     }
 
     public ServerConfigurationService getServerConfigurationService() {
@@ -59,6 +70,7 @@ public class Platform {
 
         private Marshaller<Task> taskMarshaller;
         private Marshaller<Result> resultMarshaller;
+        private Marshaller<Message> messageMarshaller;
         private ResultService resultService;
         private TaskService taskService;
         private TaskSupplier taskSupplier;
@@ -75,6 +87,11 @@ public class Platform {
 
         public Builder setResultMarshaller(Marshaller<Result> resultMarshaller) {
             this.resultMarshaller = resultMarshaller;
+            return this;
+        }
+
+        public Builder setMessageMarshaller(Marshaller<Message> messageMarshaller) {
+            this.messageMarshaller = messageMarshaller;
             return this;
         }
 
@@ -108,7 +125,7 @@ public class Platform {
         }
 
         public Platform build() {
-            return new Platform(taskMarshaller, resultMarshaller,
+            return new Platform(taskMarshaller, resultMarshaller, messageMarshaller,
                     resultService, taskService, taskSupplier,
                     serverConfigurationService,
                     handler);

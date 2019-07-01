@@ -36,7 +36,7 @@ public class PlatformFactory {
 
         Marshaller<Task> taskMarshaller = new IdOnlyTaskMarshaller();
         Marshaller<TaskUri> taskUriMarshaller = new TaskUriMarshaller();
-        Marshaller<Result> resultMarshaller = new ResultMarshaller("", taskUriMarshaller);
+        Marshaller<Result> resultMarshaller = new ResultMarshaller(taskUriMarshaller);
         Marshaller<Message> messageMarshaller = new MessageMarshaller(taskMarshaller, resultMarshaller);
 
         Handler handler = new SimpleHandler(
@@ -54,6 +54,7 @@ public class PlatformFactory {
                 .setHandler(handler)
                 .setResultMarshaller(resultMarshaller)
                 .setTaskMarshaller(taskMarshaller)
+                .setMessageMarshaller(messageMarshaller)
                 .setServerConfigurationService(serverConfigurationService)
                 .setTaskSupplier(taskSupplier)
                 .build();

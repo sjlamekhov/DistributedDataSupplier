@@ -27,7 +27,7 @@ public class ClientApplication {
         Marshaller<Task> taskMarshaller = new IdOnlyTaskMarshaller();
         Marshaller<TaskUri> taskUriMarshaller = new TaskUriMarshaller();
         MessageMarshaller messageMarshaller = new MessageMarshaller(
-                taskMarshaller, new ResultMarshaller(tenantId, taskUriMarshaller)
+                taskMarshaller, new ResultMarshaller(taskUriMarshaller)
         );
         Client client = new Client(configurationService.getHost(), configurationService.getPort());
         if (!client.isStarted()) {

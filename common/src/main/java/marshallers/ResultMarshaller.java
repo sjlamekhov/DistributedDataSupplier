@@ -14,13 +14,9 @@ public class ResultMarshaller implements Marshaller<Result> {
     private static final String FIELD_SEPARATOR = "_;_";
     private static final String KEYVALUE_SEPARATOR = "_->_";
 
-    private static final String SEPARATOR = "@=@";
-
-    private final String tenantId;
     private final Marshaller<TaskUri> taskUriMarshaller;
 
-    public ResultMarshaller(String tenantId, Marshaller<TaskUri> taskUriMarshaller) {
-        this.tenantId = tenantId;
+    public ResultMarshaller(Marshaller<TaskUri> taskUriMarshaller) {
         this.taskUriMarshaller = taskUriMarshaller;
     }
 
@@ -51,6 +47,6 @@ public class ResultMarshaller implements Marshaller<Result> {
             String[] splittedEntry = splitted[i].split(KEYVALUE_SEPARATOR);
             fields.put(splittedEntry[0], splittedEntry[1]);
         }
-        return new Result(new ResultUri(tenantId), taskUri, fields);
+        return new Result(new ResultUri(taskUri.getTenantId()), taskUri, fields);
     }
 }

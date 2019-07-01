@@ -8,19 +8,19 @@ import distributeddatasupplier.server.network.handlers.SimpleHandler;
 import distributeddatasupplier.server.network.messageTransceiver.NetworkTransceiver;
 import distributeddatasupplier.server.network.selectorfactory.NetworkSelectorFactory;
 import distributeddatasupplier.server.network.selectorfactory.SelectorFactory;
+import distributeddatasupplier.server.platform.Platform;
+import distributeddatasupplier.server.platform.PlatformFactory;
 import distributeddatasupplier.server.services.ResultService;
 import configuration.ServerConfigurationService;
-import marshallers.TaskUriMarshaller;
+import marshallers.*;
+import messaging.Message;
 import objects.TaskUri;
 import persistence.InMemoryPersistence;
 import persistence.tasks.InMemoryTaskPersistence;
 import persistence.tasks.TaskPersistenceLayer;
 import distributeddatasupplier.server.services.TaskService;
 import distributeddatasupplier.server.suppliers.TaskSupplier;
-import marshallers.MessageMarshaller;
-import marshallers.ResultMarshaller;
 import objects.Task;
-import marshallers.IdOnlyTaskMarshaller;
 
 import java.io.IOException;
 import java.util.Collections;
@@ -32,15 +32,13 @@ public class ServerApplication {
     //demo
     public static void main(String[] args) throws IOException {
         System.out.println("supplierServer started");
-        ServerConfigurationService configurationService = ServerConfigurationService.buildServerConfiguration(
-                ConfigProvider.getProperties()
-        );
+
+        Platform platform = PlatformFactory.buildPlatformFromConfig(ConfigProvider.getProperties());
+        ServerConfigurationService configurationService = platform.getServerConfigurationService();
         System.out.println(String.format("host=%s, port=%s",
                 configurationService.getHost(), configurationService.getPort()));
-        TaskSupplier taskSupplier = new TaskSupplier(new TaskService(DaoFactory.buildTaskDao(configurationService)));
-        ResultService resultService = new ResultService(new ResultDao(new InMemoryPersistence<>()));
-        MessageMarshaller messageMarshaller = new MessageMarshaller(
-                new IdOnlyTaskMarshaller(), new ResultMarshaller(tenantId, new TaskUriMarshaller()));
+
+        TaskSupplier taskSupplier = platform.getTaskSupplier();
         for (int i = 0; i < 32; i++) {
             taskSupplier.addTask(new Task(new TaskUri(tenantId), Collections.emptyMap()));
         }
@@ -50,12 +48,7 @@ public class ServerApplication {
                 configurationService.getHost(),
                 configurationService.getPort());
         ServerLoop serverLoop = new ServerLoop(
-                new SimpleHandler(
-                        Collections.singleton(tenantId),
-                        taskSupplier,
-                        resultService,
-                        new NetworkTransceiver(),
-                        messageMarshaller),
+                platform.getHandler(),
                 selectorFactory.getSelector(),
                 selectorFactory.getServerSocket(),
                 configurationService.getMaxExecutionTime(),

@@ -96,7 +96,7 @@ public class SimpleHandlerTest {
         resultService = new ResultService(new ResultDao(resultPersistence));
         taskSupplier = new TaskSupplier(taskService);
         messageMarshaller = new MessageMarshaller(new IdOnlyTaskMarshaller(),
-                new ResultMarshaller(tenantId, new TaskUriMarshaller()));
+                new ResultMarshaller(new TaskUriMarshaller()));
         fillTestMessages(sendedMessages, receivedMessages);
         simpleHandler = new SimpleHandler(
                 Collections.singleton(tenantId),

@@ -30,7 +30,7 @@ public class ServerTest {
     private static final String tenantId = "tenantId";
 
     private static MessageMarshaller getMessageMarshaller() {
-        return new MessageMarshaller(new IdOnlyTaskMarshaller(), new ResultMarshaller(tenantId, new TaskUriMarshaller()));
+        return new MessageMarshaller(new IdOnlyTaskMarshaller(), new ResultMarshaller(new TaskUriMarshaller()));
     }
 
     private static DumpableHandler getHandler() {
