@@ -6,6 +6,7 @@ import distributeddatasupplier.server.ServerLoop;
 import distributeddatasupplier.server.network.selectorfactory.SelectorFactory;
 import marshallers.TaskUriMarshaller;
 import objects.TaskUri;
+import persistence.converters.TaskConverter;
 import persistence.tasks.InMemoryTaskPersistence;
 import persistence.tasks.TaskPersistenceLayer;
 import distributeddatasupplier.server.services.TaskService;
@@ -34,7 +35,7 @@ public class ServerTest {
     }
 
     private static DumpableHandler getHandler() {
-        TaskPersistenceLayer taskPersistenceLayer = new InMemoryTaskPersistence();
+        TaskPersistenceLayer taskPersistenceLayer = new InMemoryTaskPersistence(new TaskConverter(tenantId));
         TaskDao taskDao = new TaskDao(taskPersistenceLayer);
         CompositeTaskDao compositeTaskDao = new CompositeTaskDao();
         compositeTaskDao.addDao(tenantId, taskDao);

@@ -1,17 +1,21 @@
 package persistence.tasks;
 
+import com.mongodb.BasicDBObject;
 import objects.Task;
 import objects.TaskStatus;
 import objects.TaskUri;
+import persistence.converters.ObjectConverter;
 
 import java.util.*;
 
 public class InMemoryTaskPersistence implements TaskPersistenceLayer {
 
-    private final Map<TaskUri, Task> tasks;
+    private final Map<TaskUri, BasicDBObject> tasks;
+    private final ObjectConverter<Task, BasicDBObject> converter;
 
-    public InMemoryTaskPersistence() {
-        tasks = new HashMap<>();
+    public InMemoryTaskPersistence(ObjectConverter<Task, BasicDBObject> converter) {
+        this.tasks = new HashMap<>();
+        this.converter = converter;
     }
 
     @Override
@@ -22,27 +26,33 @@ public class InMemoryTaskPersistence implements TaskPersistenceLayer {
     @Override
     public Task add(Task object) {
         Objects.requireNonNull(object);
-        tasks.put(object.getUri(), object);
+        BasicDBObject dbObject = converter.buildToFromObject(object);
+        tasks.put(object.getUri(), dbObject);
         return object;
     }
 
     @Override
     public Task update(Task object) {
         Objects.requireNonNull(object);
-        tasks.put(object.getUri(), object);
+        BasicDBObject dbObject = converter.buildToFromObject(object);
+        tasks.put(object.getUri(), dbObject);
         return object;
     }
 
     @Override
-    public Task getByUri(TaskUri objectUri) {
-        return tasks.get(objectUri);
+    public Task getByUri(TaskUri taskUri) {
+        BasicDBObject dbObject = tasks.get(taskUri);
+        if (dbObject == null) {
+            return null;
+        }
+        return converter.buildObjectFromTO(dbObject);
     }
 
     @Override
     public Collection<Task> getByUris(Collection<TaskUri> objectUris) {
         List<Task> result = new ArrayList<>();
         for (TaskUri taskUri : objectUris) {
-            Task task = tasks.get(taskUri);
+            Task task = getByUri(taskUri);
             if (task != null) {
                 result.add(task);
             }
@@ -63,7 +73,8 @@ public class InMemoryTaskPersistence implements TaskPersistenceLayer {
     @Override
     public Collection<Task> getTasksByStatus(TaskStatus taskStatus, int limit) {
         List<Task> result = new ArrayList<>();
-        for (Task task : tasks.values()) {
+        for (BasicDBObject dbObject : tasks.values()) {
+            Task task = converter.buildObjectFromTO(dbObject);
             if (task.getTaskStatus() == taskStatus) {
                 result.add(task);
             }
@@ -76,16 +87,17 @@ public class InMemoryTaskPersistence implements TaskPersistenceLayer {
 
     @Override
     public void setTaskStatus(TaskUri taskUri, TaskStatus taskStatus) {
-        Task task = tasks.get(taskUri);
+        Task task = getByUri(taskUri);
         if (task != null) {
             task.setTaskStatus(taskStatus);
-            tasks.put(taskUri, task);
+            update(task);
         }
     }
 
     @Override
     public boolean hasTasksWithStatus(TaskStatus taskStatus) {
-        for (Task task : tasks.values()) {
+        for (BasicDBObject dbObject : tasks.values()) {
+            Task task = converter.buildObjectFromTO(dbObject);
             if (task.getTaskStatus() == taskStatus) {
                 return true;
             }

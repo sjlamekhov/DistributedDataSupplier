@@ -7,6 +7,8 @@ import distributeddatasupplier.server.services.ResultService;
 import marshallers.TaskUriMarshaller;
 import objects.*;
 import persistence.InMemoryPersistence;
+import persistence.converters.ResultConverter;
+import persistence.converters.TaskConverter;
 import persistence.tasks.InMemoryTaskPersistence;
 import persistence.tasks.TaskPersistenceLayer;
 import distributeddatasupplier.server.services.TaskService;
@@ -87,12 +89,12 @@ public class SimpleHandlerTest {
 
     @Before
     public void init() {
-        TaskPersistenceLayer taskPersistenceLayer = new InMemoryTaskPersistence();
+        TaskPersistenceLayer taskPersistenceLayer = new InMemoryTaskPersistence(new TaskConverter(tenantId));
         CompositeTaskDao compositeTaskDao = new CompositeTaskDao();
         compositeTaskDao.addDao(tenantId, new TaskDao(taskPersistenceLayer));
         taskService = new TaskService(compositeTaskDao);
         fillTestData(taskService);
-        resultPersistence = new InMemoryPersistence<>();
+        resultPersistence = new InMemoryPersistence<>(new ResultConverter(tenantId));
         resultService = new ResultService(new ResultDao(resultPersistence));
         taskSupplier = new TaskSupplier(taskService);
         messageMarshaller = new MessageMarshaller(new IdOnlyTaskMarshaller(),

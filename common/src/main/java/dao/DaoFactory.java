@@ -6,6 +6,8 @@ import objects.Result;
 import objects.ResultUri;
 import persistence.InMemoryPersistence;
 import persistence.PersistenceLayer;
+import persistence.converters.ResultConverter;
+import persistence.converters.TaskConverter;
 import persistence.tasks.InMemoryTaskPersistence;
 import persistence.tasks.TaskPersistenceLayer;
 
@@ -25,7 +27,8 @@ public class DaoFactory {
             DaoConfiguration daoConfiguration = daoConfigEntry.getValue();
             TaskDao taskDao = null;
             if (Objects.equals(daoConfiguration.getValueByKey(DAO_TYPE), DAO_TYPE_INMEMORY)) {
-                TaskPersistenceLayer taskPersistence = new InMemoryTaskPersistence();
+                TaskConverter taskConverter = new TaskConverter(tenantId);
+                TaskPersistenceLayer taskPersistence = new InMemoryTaskPersistence(taskConverter);
                 taskDao = new TaskDao(taskPersistence);
             }
             if (taskDao != null) {
@@ -43,7 +46,8 @@ public class DaoFactory {
             DaoConfiguration daoConfiguration = daoConfigEntry.getValue();
             ResultDao resultDao = null;
             if (Objects.equals(daoConfiguration.getValueByKey(DAO_TYPE), DAO_TYPE_INMEMORY)) {
-                PersistenceLayer<ResultUri, Result> resultPersistence = new InMemoryPersistence<>();
+                ResultConverter resultConverter = new ResultConverter(tenantId);
+                PersistenceLayer<ResultUri, Result> resultPersistence = new InMemoryPersistence<>(resultConverter);
                 resultDao = new ResultDao(resultPersistence);
             }
             if (resultDao != null) {
