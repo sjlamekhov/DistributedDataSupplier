@@ -45,7 +45,7 @@ public class ServerTest {
         );
     }
 
-    @Test(timeout=800000000)
+    @Test(timeout=60000)
     public void testServerLoop() throws IOException {
         MessageMarshaller messageMarshaller = getMessageMarshaller();
         DumpableHandler dumpableHandler = getHandler();

@@ -3,8 +3,8 @@ package distributeddatasupplier.server.network.handlers;
 import distributeddatasupplier.server.network.SelectorUtils;
 import distributeddatasupplier.server.network.messageTransceiver.Transceiver;
 import distributeddatasupplier.server.services.ResultService;
+import distributeddatasupplier.server.services.status.ServerStatusService;
 import marshallers.Marshaller;
-import marshallers.MessageMarshaller;
 import messaging.FlowControl;
 import messaging.Message;
 import objects.Result;
@@ -17,6 +17,8 @@ import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
 import java.util.Objects;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 
 public class SimpleHandler implements Handler {
 
@@ -25,26 +27,34 @@ public class SimpleHandler implements Handler {
     private final ResultService resultService;
     private final Transceiver transceiver;
     private final Marshaller<Message> messageMarshaller;
+    private final ServerStatusService serverStatusService;
+    private AtomicLong numberOfClients = new AtomicLong(0L);
+    private AtomicLong numberOfProcessedTasks = new AtomicLong(0L);
 
     public SimpleHandler(Set<String> tenantIds,
                          TaskSupplier taskSupplier,
                          ResultService resultService,
                          Transceiver transceiver,
-                         Marshaller<Message> messageMarshaller) {
+                         Marshaller<Message> messageMarshaller,
+                         ServerStatusService serverStatusService) {
         this.tenantIds = tenantIds;
         this.taskSupplier = taskSupplier;
         this.resultService = resultService;
         this.transceiver = transceiver;
         this.messageMarshaller = messageMarshaller;
+        this.serverStatusService = serverStatusService;
     }
 
     @Override
     public void handleAcceptable(Selector selector, ServerSocketChannel serverSocket, SelectionKey key) throws IOException {
+        serverStatusService.incrementNumberOfAcceptRequests();
         SelectorUtils.register(selector, serverSocket, SelectionKey.OP_WRITE);
+        serverStatusService.setNumberOfAliveClients(numberOfClients.incrementAndGet());
     }
 
     @Override
     public void handleReadable(Selector selector, ServerSocketChannel serverSocket, SelectionKey key) throws IOException {
+        serverStatusService.incrementNumberOfReadRequests();
         String message = transceiver.getMessage(key);
         if (!message.isEmpty()) {
             Message messageObject = messageMarshaller.unmarshall(message);
@@ -58,11 +68,13 @@ public class SimpleHandler implements Handler {
             } else {
                 resultService.add(result);
                 taskSupplier.markTaskAsFinished(result.getTaskUri());
+                serverStatusService.setNumberOfProcessedTasks(numberOfProcessedTasks.incrementAndGet());
             }
             System.out.println(String.format("from %s:\t%s", selector.hashCode(), messageObject));
             if (messageObject.getFlowControl() == FlowControl.GETNEXTTASK) {
                 SelectorUtils.prepareForWrite(selector, key);
             } else if (messageObject.getFlowControl() == FlowControl.LAST) {
+                serverStatusService.setNumberOfAliveClients(numberOfClients.decrementAndGet());
                 key.cancel();
             }
         }
@@ -70,6 +82,7 @@ public class SimpleHandler implements Handler {
 
     @Override
     public void handleWritable(Selector selector, ServerSocketChannel serverSocket, SelectionKey key) throws IOException {
+        serverStatusService.incrementNumberOfWriteRequests();
         Task task = null;
         for (String tenantId : tenantIds) {
             task = taskSupplier.pollTask(tenantId);

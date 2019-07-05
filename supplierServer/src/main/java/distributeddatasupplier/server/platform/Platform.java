@@ -4,6 +4,7 @@ import configuration.ServerConfigurationService;
 import distributeddatasupplier.server.network.handlers.Handler;
 import distributeddatasupplier.server.services.ResultService;
 import distributeddatasupplier.server.services.TaskService;
+import distributeddatasupplier.server.services.status.ServerStatusService;
 import distributeddatasupplier.server.suppliers.TaskSupplier;
 import marshallers.Marshaller;
 import messaging.Message;
@@ -19,11 +20,14 @@ public class Platform {
     private final TaskService taskService;
     private final TaskSupplier taskSupplier;
     private final ServerConfigurationService serverConfigurationService;
+    private final ServerStatusService serverStatusService;
     private final Handler handler;
 
     private Platform(Marshaller<Task> taskMarshaller, Marshaller<Result> resultMarshaller, Marshaller<Message> messageMarshaller,
                      ResultService resultService, TaskService taskService, TaskSupplier taskSupplier,
-                     ServerConfigurationService serverConfigurationService, Handler handler) {
+                     ServerConfigurationService serverConfigurationService,
+                     ServerStatusService serverStatusService,
+                     Handler handler) {
         this.taskMarshaller = taskMarshaller;
         this.resultMarshaller = resultMarshaller;
         this.messageMarshaller = messageMarshaller;
@@ -31,6 +35,7 @@ public class Platform {
         this.taskService = taskService;
         this.taskSupplier = taskSupplier;
         this.serverConfigurationService = serverConfigurationService;
+        this.serverStatusService = serverStatusService;
         this.handler = handler;
     }
 
@@ -76,6 +81,7 @@ public class Platform {
         private TaskSupplier taskSupplier;
         private ServerConfigurationService serverConfigurationService;
         private Handler handler;
+        private ServerStatusService serverStatusService;
 
         protected Builder() {
         }
@@ -120,6 +126,11 @@ public class Platform {
             return this;
         }
 
+        public Builder setServerStatusService(ServerStatusService serverStatusService) {
+            this.serverStatusService = serverStatusService;
+            return this;
+        }
+
         public static Builder newInstance() {
             return new Builder();
         }
@@ -127,7 +138,7 @@ public class Platform {
         public Platform build() {
             return new Platform(taskMarshaller, resultMarshaller, messageMarshaller,
                     resultService, taskService, taskSupplier,
-                    serverConfigurationService,
+                    serverConfigurationService, serverStatusService,
                     handler);
         }
     }

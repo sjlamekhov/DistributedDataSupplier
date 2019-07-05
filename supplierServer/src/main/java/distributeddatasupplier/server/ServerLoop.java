@@ -15,7 +15,6 @@ public class ServerLoop {
     private boolean isStopped;
     private final long maxExecutionTime;
     private final Set<String> tenants;
-    private static final String tenantId = "tenantId";  //stub, to be implemented
 
     private final Handler handler;
 

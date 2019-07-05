@@ -8,6 +8,8 @@ import distributeddatasupplier.server.network.messageTransceiver.NetworkTranscei
 import distributeddatasupplier.server.network.messageTransceiver.Transceiver;
 import distributeddatasupplier.server.services.ResultService;
 import distributeddatasupplier.server.services.TaskService;
+import distributeddatasupplier.server.services.status.ServerStatus;
+import distributeddatasupplier.server.services.status.ServerStatusService;
 import distributeddatasupplier.server.suppliers.TaskSupplier;
 import marshallers.*;
 import messaging.Message;
@@ -39,12 +41,15 @@ public class PlatformFactory {
         Marshaller<Result> resultMarshaller = new ResultMarshaller(taskUriMarshaller);
         Marshaller<Message> messageMarshaller = new MessageMarshaller(taskMarshaller, resultMarshaller);
 
+        ServerStatusService serverStatusService = new ServerStatusService();
+
         Handler handler = new SimpleHandler(
                 serverConfigurationService.getTenantIds(),
                 taskSupplier,
                 resultService,
                 transceiver,
-                messageMarshaller
+                messageMarshaller,
+                serverStatusService
                 );
 
         return Platform.Builder
@@ -57,6 +62,7 @@ public class PlatformFactory {
                 .setMessageMarshaller(messageMarshaller)
                 .setServerConfigurationService(serverConfigurationService)
                 .setTaskSupplier(taskSupplier)
+                .setServerStatusService(serverStatusService)
                 .build();
     }
 

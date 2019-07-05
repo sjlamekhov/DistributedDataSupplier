@@ -4,6 +4,8 @@ import dao.CompositeTaskDao;
 import dao.ResultDao;
 import dao.TaskDao;
 import distributeddatasupplier.server.services.ResultService;
+import distributeddatasupplier.server.services.status.ServerStatus;
+import distributeddatasupplier.server.services.status.ServerStatusService;
 import marshallers.TaskUriMarshaller;
 import objects.*;
 import persistence.InMemoryPersistence;
@@ -100,12 +102,13 @@ public class SimpleHandlerTest {
         messageMarshaller = new MessageMarshaller(new IdOnlyTaskMarshaller(),
                 new ResultMarshaller(new TaskUriMarshaller()));
         fillTestMessages(sendedMessages, receivedMessages);
+        ServerStatusService serverStatusService = new ServerStatusService();
         simpleHandler = new SimpleHandler(
                 Collections.singleton(tenantId),
                 taskSupplier,
                 resultService,
                 new TranceiverMock(messageMarshaller, sendedMessages, receivedMessages),
-                messageMarshaller);
+                messageMarshaller, serverStatusService);
     }
 
     private void fillTestMessages(ArrayDeque<String> sendedMessages, ArrayDeque<String> receivedMessages) {
