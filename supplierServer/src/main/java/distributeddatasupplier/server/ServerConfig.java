@@ -60,7 +60,6 @@ public class ServerConfig {
                     serverConfigurationService.getDaoConfigurations().keySet()
             );
             serverLoop.start();
-            System.out.println("ServerLoop created");
             return serverLoop;
         } catch (Exception ignore) {}
         return null;

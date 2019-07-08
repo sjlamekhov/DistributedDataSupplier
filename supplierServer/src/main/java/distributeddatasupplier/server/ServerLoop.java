@@ -87,6 +87,11 @@ public class ServerLoop {
 
     public void stop() {
         isStopped = true;
+        try {
+            serverSocket.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
 }
