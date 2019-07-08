@@ -1,6 +1,11 @@
 package distributeddatasupplier.server;
 
 import distributeddatasupplier.server.network.handlers.Handler;
+import org.junit.Before;
+import org.springframework.context.annotation.Bean;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -36,6 +41,7 @@ public class ServerLoop {
         this.tenants = tenants;
     }
 
+    @Async
     public void start() throws IOException {
         long startupTime = System.currentTimeMillis();
         int handledAcceptable = 0, handledReadable = 0, handledWritable = 0;
