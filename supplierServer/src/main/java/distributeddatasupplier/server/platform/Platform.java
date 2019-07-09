@@ -71,6 +71,10 @@ public class Platform {
         return handler;
     }
 
+    public ServerStatusService getServerStatusService() {
+        return serverStatusService;
+    }
+
     public static class Builder {
 
         private Marshaller<Task> taskMarshaller;
