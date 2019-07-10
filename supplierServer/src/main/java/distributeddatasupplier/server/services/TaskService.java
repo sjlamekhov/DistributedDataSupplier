@@ -31,10 +31,11 @@ public class TaskService {
         return taskDao.getByUri(taskUri);
     }
 
-    public void add(Task task) {
+    public Task add(Task task) {
         if (!Objects.equals(task, Task.EMPTY_TASK)) {
             taskDao.add(task);
         }
+        return task;
     }
 
     public void delete(TaskUri taskUri) {

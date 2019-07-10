@@ -13,8 +13,9 @@ public class ResultService {
         this.resultDao = resultDao;
     }
 
-    public void add(Result result) {
+    public Result add(Result result) {
         resultDao.add(result);
+        return result;
     }
 
     public Result getByUri(ResultUri resultUri) {

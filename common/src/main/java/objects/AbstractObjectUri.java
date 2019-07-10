@@ -30,17 +30,23 @@ public abstract class AbstractObjectUri {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         AbstractObjectUri that = (AbstractObjectUri) o;
-        return id != null ? id.equals(that.id) : that.id == null;
+        if (id != null ? !id.equals(that.id) : that.id != null) return false;
+        return tenantId != null ? tenantId.equals(that.tenantId) : that.tenantId == null;
     }
 
     @Override
     public int hashCode() {
-        return id != null ? id.hashCode() : 0;
+        int result = id != null ? id.hashCode() : 0;
+        result = 31 * result + (tenantId != null ? tenantId.hashCode() : 0);
+        return result;
     }
 
     @Override
     public String toString() {
-        return id;
+        return "{" +
+                "id='" + id + '\'' +
+                ", tenantId='" + tenantId + '\'' +
+                '}';
     }
 
 }
