@@ -63,8 +63,4 @@ public class InMemoryPersistence<U extends AbstractObjectUri, T extends Abstract
         storage.remove(uri);
     }
 
-    @Override
-    public Iterator<U> getUriIterator() {
-        return storage.keySet().iterator();
-    }
 }

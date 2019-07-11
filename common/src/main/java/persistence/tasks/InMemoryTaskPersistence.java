@@ -66,11 +66,6 @@ public class InMemoryTaskPersistence implements TaskPersistenceLayer {
     }
 
     @Override
-    public Iterator<TaskUri> getUriIterator() {
-        return tasks.keySet().iterator();
-    }
-
-    @Override
     public Collection<Task> getTasksByStatus(TaskStatus taskStatus, int limit) {
         List<Task> result = new ArrayList<>();
         for (BasicDBObject dbObject : tasks.values()) {

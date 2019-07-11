@@ -72,7 +72,6 @@ public class SimpleHandlerTest {
             );
         }
         Assert.assertTrue(receivedMessages.isEmpty());
-        Assert.assertEquals(TASK_NUMBER, getSizeOfIterator(resultPersistence.getUriIterator()));
     }
 
     @Test
