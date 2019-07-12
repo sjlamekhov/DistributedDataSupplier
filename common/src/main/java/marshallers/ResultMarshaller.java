@@ -2,7 +2,6 @@ package marshallers;
 
 import objects.Result;
 import objects.ResultUri;
-import objects.Task;
 import objects.TaskUri;
 
 import java.util.HashMap;

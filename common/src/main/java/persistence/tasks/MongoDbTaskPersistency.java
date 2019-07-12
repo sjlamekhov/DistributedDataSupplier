@@ -50,7 +50,7 @@ public class MongoDbTaskPersistency implements TaskPersistenceLayer  {
     public Collection<Task> getTasksByStatus(TaskStatus taskStatus, int limit) {
         List<Task> result = new ArrayList<>();
         BasicDBObject searchQuery = new BasicDBObject();
-        searchQuery.put("taskStatus", taskStatus);
+        searchQuery.put("taskStatus", taskStatus.toString());
         DBCursor cursor = collection.find(searchQuery);
         while (cursor.hasNext() && result.size() < limit) {
             result.add(converter.buildObjectFromTO((BasicDBObject) cursor.next()));
@@ -71,7 +71,7 @@ public class MongoDbTaskPersistency implements TaskPersistenceLayer  {
     @Override
     public boolean hasTasksWithStatus(TaskStatus taskStatus) {
         BasicDBObject searchQuery = new BasicDBObject();
-        searchQuery.put("taskStatus", taskStatus);
+        searchQuery.put("taskStatus", taskStatus.toString());
         DBCursor cursor = collection.find(searchQuery);
         return cursor.hasNext();
     }

@@ -4,7 +4,6 @@ import objects.AbstractObject;
 import objects.AbstractObjectUri;
 
 import java.util.Collection;
-import java.util.Iterator;
 
 public interface PersistenceLayer<U extends AbstractObjectUri, T extends AbstractObject> {
 

@@ -1,7 +1,6 @@
 package distributeddatasupplier.server.services;
 
 import dao.AbstractDao;
-import dao.ResultDao;
 import objects.Result;
 import objects.ResultUri;
 

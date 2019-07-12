@@ -2,9 +2,7 @@ package configuration;
 
 import java.util.*;
 
-import static configuration.ConfigurationConstants.DAO_PREFIX;
-import static configuration.ConfigurationConstants.DAO_TYPE;
-import static configuration.ConfigurationConstants.DAO_TYPE_INMEMORY;
+import static configuration.ConfigurationConstants.*;
 
 public class ServerConfigurationService extends ConfigurationService {
 
@@ -32,14 +30,21 @@ public class ServerConfigurationService extends ConfigurationService {
         Set<String> tenantIds = new HashSet<>(Arrays.asList(serverConfigurationService
                 .properties.getProperty(TENANTS, TENANTS_SEPARATOR).split(",")));
         for (String tenantId : tenantIds) {
+            Map<String, String> config = new HashMap<>();
             String daoType = serverConfigurationService.properties.getProperty(String.format("%s.%s.%s", DAO_PREFIX, tenantId, DAO_TYPE));
             if (Objects.equals(daoType, DAO_TYPE_INMEMORY)) {
-                Map<String, String> config = new HashMap<>();
                 config.put(DAO_TYPE, DAO_TYPE_INMEMORY);
-                serverConfigurationService.daoConfigurations.put(tenantId, new DaoConfiguration(config));
+            } else if (Objects.equals(daoType, DAO_TYPE_MONGODB)) {
+                config.put(DAO_TYPE, DAO_TYPE_MONGODB);
             }
+            String daoHostProperty = String.format("%s.%s.%s", DAO_PREFIX, tenantId, DAO_CONFIG_HOST);
+            config.put(DAO_CONFIG_HOST, serverConfigurationService.properties.getProperty(daoHostProperty, "localhost:27017"));
+            serverConfigurationService.daoConfigurations.put(tenantId, new DaoConfiguration(config));
         }
         return serverConfigurationService;
     }
 
+    public boolean isDemoMode() {
+        return properties.containsKey(DEMO_MODE);
+    }
 }

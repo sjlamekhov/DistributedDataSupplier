@@ -32,7 +32,7 @@ public class DaoFactory {
                 TaskConverter taskConverter = new TaskConverter(tenantId);
                 TaskPersistenceLayer taskPersistence = new InMemoryTaskPersistence(taskConverter);
                 taskDao = new TaskDao(taskPersistence);
-            } else if (Objects.equals(daoConfiguration.getValueByKey(DAO_TYPE), DAO_TYPE_MULTITABLE)) {
+            } else if (Objects.equals(daoConfiguration.getValueByKey(DAO_TYPE), DAO_TYPE_MONGODB)) {
                 TaskConverter taskConverter = new TaskConverter(tenantId);
                 TaskPersistenceLayer taskPersistence = new MongoDbTaskPersistency(daoConfiguration,
                         taskConverter,
@@ -59,7 +59,7 @@ public class DaoFactory {
                 ResultConverter resultConverter = new ResultConverter(tenantId);
                 PersistenceLayer<ResultUri, Result> resultPersistence = new InMemoryPersistence<>(resultConverter);
                 resultDao = new ResultDao(resultPersistence);
-            } else if (Objects.equals(daoConfiguration.getValueByKey(DAO_TYPE), DAO_TYPE_MULTITABLE)) {
+            } else if (Objects.equals(daoConfiguration.getValueByKey(DAO_TYPE), DAO_TYPE_MONGODB)) {
                 ResultConverter resultConverter = new ResultConverter(tenantId);
                 MongoDbPersistency<ResultUri, Result> resultPersistence = new MongoDbPersistency<>(daoConfiguration, resultConverter, tenantId, tableName);
                 resultDao = new ResultDao(resultPersistence);

@@ -22,7 +22,7 @@ public class ClientApplication {
         ClientConfigurationService configurationService = new ClientConfigurationService(
                 ConfigProvider.getProperties()
         );
-        final String tenantId = configurationService.getTenantId();
+
         TaskProcessor<Task, Result> taskProcessor = new AppenderTaskProcessor();
         Marshaller<Task> taskMarshaller = new IdOnlyTaskMarshaller();
         Marshaller<TaskUri> taskUriMarshaller = new TaskUriMarshaller();

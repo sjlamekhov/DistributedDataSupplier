@@ -94,18 +94,22 @@ public class ServerConfig {
                     e.printStackTrace();
                 }
             });
-            //DEMO MODE
-            TaskService taskService = platform.getTaskService();
-            for (int i = 0; i < 16; i++) {
-                Task task = new Task(new TaskUri(UUID.randomUUID().toString(), "tenantId"), new HashMap<>());
-                System.out.println("taskId:\t" + task.getUri());
-                taskService.add(task);
-                System.out.println("taskId:\t" + task.getUri() + "added");
+            if (serverConfigurationService.isDemoMode()) {
+                addDemoData();
             }
-            //
             return serverLoop;
         } catch (Exception ignore) {}
         return null;
+    }
+
+    private void addDemoData() {
+        TaskService taskService = platform.getTaskService();
+        for (int i = 0; i < 16; i++) {
+            Task task = new Task(new TaskUri(UUID.randomUUID().toString(), "tenantId"), new HashMap<>());
+            System.out.println("taskId:\t" + task.getUri());
+            taskService.add(task);
+            System.out.println("taskId:\t" + task.getUri() + "\tadded");
+        }
     }
 
     @Bean(name = "taskExecutor")

@@ -1,6 +1,5 @@
 package distributeddatasupplier.server.services;
 
-import dao.CompositeTaskDao;
 import dao.TaskDao;
 import objects.Task;
 import objects.TaskStatus;

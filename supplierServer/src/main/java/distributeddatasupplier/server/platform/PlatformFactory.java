@@ -2,16 +2,12 @@ package distributeddatasupplier.server.platform;
 
 import configuration.ServerConfigurationService;
 import dao.*;
-import distributeddatasupplier.server.ServerLoop;
 import distributeddatasupplier.server.network.handlers.Handler;
 import distributeddatasupplier.server.network.handlers.SimpleHandler;
 import distributeddatasupplier.server.network.messageTransceiver.NetworkTransceiver;
 import distributeddatasupplier.server.network.messageTransceiver.Transceiver;
-import distributeddatasupplier.server.network.selectorfactory.NetworkSelectorFactory;
-import distributeddatasupplier.server.network.selectorfactory.SelectorFactory;
 import distributeddatasupplier.server.services.ResultService;
 import distributeddatasupplier.server.services.TaskService;
-import distributeddatasupplier.server.services.status.ServerStatus;
 import distributeddatasupplier.server.services.status.ServerStatusService;
 import distributeddatasupplier.server.suppliers.TaskSupplier;
 import marshallers.*;
@@ -23,7 +19,6 @@ import objects.TaskUri;
 
 import java.util.Properties;
 
-//TODO: implement and integrate
 public class PlatformFactory {
 
     public static Platform buildPlatformFromConfig(Properties properties) {

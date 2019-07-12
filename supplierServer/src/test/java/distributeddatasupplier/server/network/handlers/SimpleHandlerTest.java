@@ -4,7 +4,6 @@ import dao.CompositeTaskDao;
 import dao.ResultDao;
 import dao.TaskDao;
 import distributeddatasupplier.server.services.ResultService;
-import distributeddatasupplier.server.services.status.ServerStatus;
 import distributeddatasupplier.server.services.status.ServerStatusService;
 import marshallers.TaskUriMarshaller;
 import objects.*;

@@ -3,7 +3,6 @@ package persistence;
 import com.mongodb.BasicDBObject;
 import objects.AbstractObject;
 import objects.AbstractObjectUri;
-import objects.Task;
 import persistence.converters.ObjectConverter;
 
 import java.util.*;

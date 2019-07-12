@@ -3,7 +3,6 @@ package persistence.converters;
 import com.mongodb.BasicDBObject;
 import objects.Result;
 import objects.ResultUri;
-import objects.Task;
 import objects.TaskUri;
 
 import java.util.Arrays;
@@ -31,7 +30,7 @@ public class ResultConverter implements ObjectConverter<Result, BasicDBObject> {
         }
         TaskUri taskUri = null;
         if (transferObject.containsField("_taskId")) {
-            taskUri = new TaskUri(transferObject.getString("_id"), tenantId);
+            taskUri = new TaskUri(transferObject.getString("_taskId"), tenantId);
         }
         Map<String, String> attributes = transferObject.entrySet().stream()
                 .filter(i -> !attributeNamesToSkip.contains(i.getKey()))

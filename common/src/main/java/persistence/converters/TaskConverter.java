@@ -52,7 +52,7 @@ public class TaskConverter implements ObjectConverter<Task, BasicDBObject> {
         }
         basicDBObject.put("createTimestamp", task.getCreateTimestamp());
         basicDBObject.put("updateTimestamp", task.getUpdateTimestamp());
-        basicDBObject.put("taskStatus", task.getTaskStatus());
+        basicDBObject.put("taskStatus", task.getTaskStatus().toString());
         task.getTaskProperties().forEach(basicDBObject::put);
         return basicDBObject;
     }

@@ -10,6 +10,6 @@ public class TaskUri extends AbstractObjectUri {
         super(id, tenantId);
     }
 
-    public static TaskUri EMPTY = new TaskUri("EMPTY", null);
+    public static TaskUri EMPTY = new TaskUri("EMPTY", "_null_");
 
 }
