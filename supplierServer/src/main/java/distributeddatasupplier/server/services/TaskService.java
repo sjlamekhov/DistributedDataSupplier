@@ -6,6 +6,7 @@ import objects.TaskStatus;
 import objects.TaskUri;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class TaskService {
 
@@ -47,5 +48,11 @@ public class TaskService {
 
     public void markTaskAsFinished(TaskUri taskUri) {
         taskDao.setTaskStatus(taskUri, TaskStatus.FINISHED);
+    }
+
+    public Collection<TaskUri> getTaskUrisByStatus(String tenantId, TaskStatus taskStatus, int limit) {
+        return taskDao.getTasksByStatus(tenantId, taskStatus, limit).stream()
+                .map(Task::getUri)
+                .collect(Collectors.toSet());
     }
 }

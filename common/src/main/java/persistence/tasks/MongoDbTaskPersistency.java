@@ -1,6 +1,7 @@
 package persistence.tasks;
 
 import com.mongodb.*;
+import com.mongodb.client.model.DBCollectionFindOptions;
 import configuration.DaoConfiguration;
 import objects.AbstractObjectUri;
 import objects.Task;
@@ -8,10 +9,7 @@ import objects.TaskStatus;
 import objects.TaskUri;
 import persistence.converters.ObjectConverter;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static configuration.ConfigurationConstants.DAO_CONFIG_HOST;
@@ -138,5 +136,18 @@ public class MongoDbTaskPersistency implements TaskPersistenceLayer  {
         BasicDBObject deleteQuery = new BasicDBObject();
         deleteQuery.put("_id", uri.getId());
         collection.remove(deleteQuery);
+    }
+
+    @Override
+    public Collection<TaskUri> getObjectUris(int responseSizeLimit) {
+        Set<TaskUri> result = new HashSet<>();
+        BasicDBObject getUrisQuery = new BasicDBObject();
+        DBCollectionFindOptions findOptions = new DBCollectionFindOptions().limit(responseSizeLimit);
+        DBCursor cursor = collection.find(getUrisQuery, findOptions);
+        while (cursor.hasNext()) {
+            BasicDBObject dbObject = (BasicDBObject) cursor.next();
+            result.add(converter.buildObjectFromTO(dbObject).getUri());
+        }
+        return result;
     }
 }

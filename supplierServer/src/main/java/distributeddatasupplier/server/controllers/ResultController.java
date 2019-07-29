@@ -10,11 +10,21 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Collection;
+
 @RestController
 public class ResultController {
 
+    private static final int RESPONSE_SIZE_LIMIT = 16;
+
     @Autowired
     private ResultService resultService;
+
+    @RequestMapping(value = "/tenants/{tenantId}/results",
+            produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.GET)
+    public Collection<ResultUri> getTasksByStatus(@PathVariable("tenantId") String tenantId) {
+        return resultService.getObjectUris(RESPONSE_SIZE_LIMIT);
+    }
 
     @RequestMapping(value = "/tenants/{tenantId}/results/{resultId}",
             produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.GET)

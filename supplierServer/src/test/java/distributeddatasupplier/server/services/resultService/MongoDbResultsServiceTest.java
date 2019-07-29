@@ -3,11 +3,9 @@ package distributeddatasupplier.server.services.resultService;
 import configuration.DaoConfiguration;
 import configuration.FileUtils;
 import configuration.ServerConfigurationService;
-import dao.CompositeDao;
+import dao.CompositeResultDao;
 import dao.DaoFactory;
 import distributeddatasupplier.server.services.ResultService;
-import objects.Result;
-import objects.ResultUri;
 import org.junit.After;
 import org.junit.Before;
 import utils.MongoDbUtils;
@@ -27,7 +25,7 @@ public class MongoDbResultsServiceTest extends AbstractResultServiceTest {
         ServerConfigurationService configurationService = ServerConfigurationService.buildServerConfiguration(properties);
         daoConfiguration = configurationService.getDaoConfigurations().get(tenantId);
         tableName = daoConfiguration.getValueByKeyOrDefault(TASKS_TABLENAME, "tasks");
-        CompositeDao<ResultUri, Result> resultDao = DaoFactory.buildResultDao(configurationService);
+        CompositeResultDao resultDao = DaoFactory.buildResultDao(configurationService);
         return new ResultService(resultDao);
     }
 

@@ -27,7 +27,7 @@ public class PlatformFactory {
         TaskDao compositeTaskDao = DaoFactory.buildTaskDao(serverConfigurationService);
         TaskService taskService = new TaskService(compositeTaskDao);
 
-        CompositeDao<ResultUri, Result> resultDao = DaoFactory.buildResultDao(serverConfigurationService);
+        CompositeResultDao resultDao = DaoFactory.buildResultDao(serverConfigurationService);
         ResultService resultService = new ResultService(resultDao);
 
         TaskSupplier taskSupplier = new TaskSupplier(taskService);

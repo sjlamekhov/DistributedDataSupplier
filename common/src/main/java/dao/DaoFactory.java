@@ -47,8 +47,8 @@ public class DaoFactory {
         return compositeDao;
     }
 
-    public static CompositeDao<ResultUri, Result> buildResultDao(ServerConfigurationService serverConfigurationService) {
-        CompositeDao<ResultUri, Result> compositeDao = new CompositeDao<>();
+    public static CompositeResultDao buildResultDao(ServerConfigurationService serverConfigurationService) {
+        CompositeResultDao compositeResultDao = new CompositeResultDao();
         Map<String, DaoConfiguration> daoConfigurations = serverConfigurationService.getDaoConfigurations();
         for (Map.Entry<String, DaoConfiguration> daoConfigEntry : daoConfigurations.entrySet()) {
             String tenantId = daoConfigEntry.getKey();
@@ -65,9 +65,9 @@ public class DaoFactory {
                 resultDao = new ResultDao(resultPersistence);
             }
             if (resultDao != null) {
-                compositeDao.addDao(tenantId, resultDao);
+                compositeResultDao.addDao(tenantId, resultDao);
             }
         }
-        return compositeDao;
+        return compositeResultDao;
     }
 }

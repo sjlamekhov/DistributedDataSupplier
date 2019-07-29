@@ -1,24 +1,24 @@
 package dao;
 
-import objects.AbstractObject;
-import objects.AbstractObjectUri;
+import objects.Result;
+import objects.ResultUri;
 
 import java.util.*;
 
-public class CompositeDao<U extends AbstractObjectUri, T extends AbstractObject> extends AbstractDao<U,T> {
+public class CompositeResultDao extends ResultDao {
 
-    protected final Map<String, AbstractDao<U,T>> daoMapping;
+    protected final Map<String, ResultDao> daoMapping;
 
-    public CompositeDao() {
+    public CompositeResultDao() {
         super(null);
         this.daoMapping = new HashMap<>();
     }
 
-    public AbstractDao<U, T> getDao(String tenantId) {
+    public ResultDao getDao(String tenantId) {
         return daoMapping.get(tenantId);
     }
 
-    public void addDao(String tenantId, AbstractDao<U, T> dao) {
+    public void addDao(String tenantId, ResultDao dao) {
         if (daoMapping.containsKey(tenantId)) {
             throw new RuntimeException(String.format("DAO for %s tenant is already registered", tenantId));
         }
@@ -26,31 +26,31 @@ public class CompositeDao<U extends AbstractObjectUri, T extends AbstractObject>
     }
 
     @Override
-    public boolean isUriPresented(U uri) {
+    public boolean isUriPresented(ResultUri uri) {
         String tenantId = uri.getTenantId();
         return getDaoInternal(tenantId).isUriPresented(uri);
     }
 
     @Override
-    public T add(T object) {
+    public Result add(Result object) {
         String tenantId = object.getUri().getTenantId();
         return getDaoInternal(tenantId).add(object);
     }
 
     @Override
-    public T update(T object) {
+    public Result update(Result object) {
         String tenantId = object.getUri().getTenantId();
         return getDaoInternal(tenantId).update(object);
     }
 
     @Override
-    public T getByUri(U uri) {
+    public Result getByUri(ResultUri uri) {
         String tenantId = uri.getTenantId();
         return getDaoInternal(tenantId).getByUri(uri);
     }
 
     @Override
-    public Collection<T> getByUris(Collection<U> documentUris) {
+    public Collection<Result> getByUris(Collection<ResultUri> documentUris) {
         Objects.requireNonNull(documentUris);
         if (documentUris.isEmpty()) {
             return Collections.emptySet();
@@ -60,17 +60,17 @@ public class CompositeDao<U extends AbstractObjectUri, T extends AbstractObject>
     }
 
     @Override
-    public void deleteObject(U uri) {
+    public void deleteObject(ResultUri uri) {
         Objects.requireNonNull(uri);
         String tenantId = uri.getTenantId();
         getDaoInternal(tenantId).deleteObject(uri);
     }
 
-    private AbstractDao<U, T> getDaoInternal(String tenantId) {
+    private ResultDao getDaoInternal(String tenantId) {
         if (!daoMapping.containsKey(tenantId)) {
             throw new RuntimeException(String.format("DAO for tenant %s is not registered", tenantId));
         }
-        AbstractDao<U, T> dao = daoMapping.get(tenantId);
+        ResultDao dao = daoMapping.get(tenantId);
         return dao;
     }
 }

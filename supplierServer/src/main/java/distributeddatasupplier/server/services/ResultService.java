@@ -1,14 +1,16 @@
 package distributeddatasupplier.server.services;
 
-import dao.AbstractDao;
+import dao.ResultDao;
 import objects.Result;
 import objects.ResultUri;
 
+import java.util.Collection;
+
 public class ResultService {
 
-    private final AbstractDao<ResultUri, Result> resultDao;
+    private final ResultDao resultDao;
 
-    public ResultService(AbstractDao<ResultUri, Result> resultDao) {
+    public ResultService(ResultDao resultDao) {
         this.resultDao = resultDao;
     }
 
@@ -21,4 +23,7 @@ public class ResultService {
         return (Result) resultDao.getByUri(resultUri);
     }
 
+    public Collection<ResultUri> getObjectUris(int responseSizeLimit) {
+        return resultDao.getObjectUris(responseSizeLimit);
+    }
 }

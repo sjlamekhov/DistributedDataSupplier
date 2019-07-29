@@ -6,6 +6,7 @@ import objects.AbstractObjectUri;
 import persistence.converters.ObjectConverter;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class InMemoryPersistence<U extends AbstractObjectUri, T extends AbstractObject> implements PersistenceLayer<U, T> {
 
@@ -60,6 +61,11 @@ public class InMemoryPersistence<U extends AbstractObjectUri, T extends Abstract
     @Override
     public void deleteObject(U uri) {
         storage.remove(uri);
+    }
+
+    @Override
+    public Collection<U> getObjectUris(int responseSizeLimit) {
+        return storage.keySet().stream().limit(responseSizeLimit).collect(Collectors.toSet());
     }
 
 }

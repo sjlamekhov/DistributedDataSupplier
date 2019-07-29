@@ -7,6 +7,7 @@ import objects.TaskUri;
 import persistence.converters.ObjectConverter;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class InMemoryTaskPersistence implements TaskPersistenceLayer {
 
@@ -63,6 +64,12 @@ public class InMemoryTaskPersistence implements TaskPersistenceLayer {
     @Override
     public void deleteObject(TaskUri uri) {
         tasks.remove(uri);
+    }
+
+    @Override
+    public Collection<TaskUri> getObjectUris(int responseSizeLimit) {
+        return tasks.keySet().stream().limit(responseSizeLimit)
+                .collect(Collectors.toSet());
     }
 
     @Override

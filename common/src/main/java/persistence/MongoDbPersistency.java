@@ -1,6 +1,7 @@
 package persistence;
 
 import com.mongodb.*;
+import com.mongodb.client.model.DBCollectionFindOptions;
 import configuration.DaoConfiguration;
 import objects.AbstractObject;
 import objects.AbstractObjectUri;
@@ -13,7 +14,7 @@ import static configuration.ConfigurationConstants.DAO_CONFIG_HOST;
 import static configuration.ConfigurationConstants.DAO_DB_NAME;
 
 public class MongoDbPersistency<U extends AbstractObjectUri, T extends AbstractObject>
-        implements PersistenceLayer<U, T>{
+        implements PersistenceLayer<U, T> {
 
     private final DaoConfiguration daoConfiguration;
     private final ObjectConverter<T, BasicDBObject> converter;
@@ -104,6 +105,19 @@ public class MongoDbPersistency<U extends AbstractObjectUri, T extends AbstractO
         BasicDBObject deleteQuery = new BasicDBObject();
         deleteQuery.put("_id", uri.getId());
         collection.remove(deleteQuery);
+    }
+
+    @Override
+    public Collection<U> getObjectUris(int responseSizeLimit) {
+        Set<U> result = new HashSet<>();
+        BasicDBObject getUrisQuery = new BasicDBObject();
+        DBCollectionFindOptions findOptions = new DBCollectionFindOptions().limit(responseSizeLimit);
+        DBCursor cursor = collection.find(getUrisQuery, findOptions);
+        while (cursor.hasNext()) {
+            BasicDBObject dbObject = (BasicDBObject) cursor.next();
+            result.add((U) converter.buildObjectFromTO(dbObject).getUri());
+        }
+        return result;
     }
 
 }

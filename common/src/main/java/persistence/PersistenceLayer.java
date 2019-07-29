@@ -13,6 +13,6 @@ public interface PersistenceLayer<U extends AbstractObjectUri, T extends Abstrac
     T getByUri(U objectUri);
     Collection<T> getByUris(Collection<U> objectUris);
     void deleteObject(U uri);
-
+    Collection<U> getObjectUris(int responseSizeLimit);
 }
 
