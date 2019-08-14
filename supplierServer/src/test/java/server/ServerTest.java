@@ -11,7 +11,7 @@ import persistence.tasks.InMemoryTaskPersistence;
 import persistence.tasks.TaskPersistenceLayer;
 import distributeddatasupplier.server.services.TaskService;
 import distributeddatasupplier.server.suppliers.TaskSupplier;
-import mock.MockSelectorFactory;
+import mocks.MockSelectorFactory;
 import mocks.DumpableHandler;
 import marshallers.MessageMarshaller;
 import marshallers.ResultMarshaller;

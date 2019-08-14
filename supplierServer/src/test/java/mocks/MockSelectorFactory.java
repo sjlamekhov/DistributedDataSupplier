@@ -1,4 +1,4 @@
-package mock;
+package mocks;
 
 import distributeddatasupplier.server.network.selectorfactory.SelectorFactory;
 

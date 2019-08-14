@@ -6,6 +6,7 @@ import dao.TaskDao;
 import distributeddatasupplier.server.services.ResultService;
 import distributeddatasupplier.server.services.status.ServerStatusService;
 import marshallers.TaskUriMarshaller;
+import mocks.ResultConsumerMock;
 import objects.*;
 import persistence.InMemoryPersistence;
 import persistence.converters.ResultConverter;
@@ -19,7 +20,7 @@ import marshallers.MessageMarshaller;
 import marshallers.ResultMarshaller;
 import messaging.FlowControl;
 import messaging.Message;
-import mock.MockSelectorFactory;
+import mocks.MockSelectorFactory;
 import mocks.TranceiverMock;
 import org.junit.Assert;
 import org.junit.Before;
@@ -27,6 +28,8 @@ import org.junit.Test;
 
 import java.io.IOException;
 import java.util.*;
+import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 public class SimpleHandlerTest {
 
@@ -40,6 +43,7 @@ public class SimpleHandlerTest {
     private TaskSupplier taskSupplier;
 
     private InMemoryPersistence<ResultUri, Result> resultPersistence;
+    private ResultConsumerMock resultConsumer;
     private ResultService resultService;
 
     private ArrayDeque<String> sendedMessages = new ArrayDeque<>();
@@ -71,6 +75,8 @@ public class SimpleHandlerTest {
             );
         }
         Assert.assertTrue(receivedMessages.isEmpty());
+        List<Result> acceptedResults = resultConsumer.getAcceptedResults();
+        Assert.assertEquals(TASK_NUMBER, acceptedResults.size());
     }
 
     @Test
@@ -96,6 +102,7 @@ public class SimpleHandlerTest {
         fillTestData(taskService);
         resultPersistence = new InMemoryPersistence<>(new ResultConverter(tenantId));
         resultService = new ResultService(new ResultDao(resultPersistence));
+        resultConsumer = new ResultConsumerMock();
         taskSupplier = new TaskSupplier(taskService);
         messageMarshaller = new MessageMarshaller(new IdOnlyTaskMarshaller(),
                 new ResultMarshaller(new TaskUriMarshaller()));
@@ -105,25 +112,17 @@ public class SimpleHandlerTest {
                 Collections.singleton(tenantId),
                 taskSupplier,
                 resultService,
+                resultConsumer,
                 new TranceiverMock(messageMarshaller, sendedMessages, receivedMessages),
                 messageMarshaller, serverStatusService);
     }
 
-    private void fillTestMessages(ArrayDeque<String> sendedMessages, ArrayDeque<String> receivedMessages) {
-        sendedMessages.clear();
+    private void fillTestMessages(ArrayDeque<String> sentMessages, ArrayDeque<String> receivedMessages) {
+        sentMessages.clear();
         receivedMessages.clear();
         getTestTasks().stream()
                 .map(t -> messageMarshaller.marshall(new Message(new Result(new ResultUri(tenantId), t.getUri(), Collections.EMPTY_MAP), FlowControl.GETNEXTTASK)))
                 .forEach(receivedMessages::add);
     }
 
-    private int getSizeOfIterator(Iterator<?> iterator) {
-        Assert.assertNotNull(iterator);
-        int count = 0;
-        while (iterator.hasNext()) {
-            iterator.next();
-            count++;
-        }
-        return count;
-    }
 }

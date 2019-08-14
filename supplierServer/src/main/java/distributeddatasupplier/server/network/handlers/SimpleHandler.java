@@ -18,12 +18,14 @@ import java.nio.channels.ServerSocketChannel;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.function.Consumer;
 
 public class SimpleHandler implements Handler {
 
     private final Set<String> tenantIds;
     private final TaskSupplier taskSupplier;
     private final ResultService resultService;
+    private final Consumer<Result> resultConsumer;
     private final Transceiver transceiver;
     private final Marshaller<Message> messageMarshaller;
     private final ServerStatusService serverStatusService;
@@ -33,15 +35,28 @@ public class SimpleHandler implements Handler {
     public SimpleHandler(Set<String> tenantIds,
                          TaskSupplier taskSupplier,
                          ResultService resultService,
+                         Consumer<Result> resultConsumer,
                          Transceiver transceiver,
                          Marshaller<Message> messageMarshaller,
                          ServerStatusService serverStatusService) {
         this.tenantIds = tenantIds;
         this.taskSupplier = taskSupplier;
         this.resultService = resultService;
+        this.resultConsumer = resultConsumer;
         this.transceiver = transceiver;
         this.messageMarshaller = messageMarshaller;
         this.serverStatusService = serverStatusService;
+    }
+
+    public SimpleHandler(Set<String> tenantIds,
+                         TaskSupplier taskSupplier,
+                         ResultService resultService,
+                         Transceiver transceiver,
+                         Marshaller<Message> messageMarshaller,
+                         ServerStatusService serverStatusService) {
+        this(tenantIds, taskSupplier, resultService,
+                r -> {},
+                transceiver, messageMarshaller, serverStatusService);
     }
 
     @Override
@@ -66,6 +81,7 @@ public class SimpleHandler implements Handler {
                 }
             } else {
                 resultService.add(result);
+                resultConsumer.accept(result);
                 taskSupplier.markTaskAsFinished(result.getTaskUri());
                 serverStatusService.setNumberOfProcessedTasks(numberOfProcessedTasks.incrementAndGet());
             }
