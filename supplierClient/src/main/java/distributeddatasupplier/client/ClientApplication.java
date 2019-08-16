@@ -3,12 +3,15 @@ package distributeddatasupplier.client;
 import configuration.ConfigProvider;
 import distributeddatasupplier.client.configuration.ClientConfigurationService;
 import distributeddatasupplier.client.processing.AppenderTaskProcessor;
+import distributeddatasupplier.client.processing.CompositeTaskProcessor;
 import distributeddatasupplier.client.processing.TaskProcessor;
+import distributeddatasupplier.client.processing.htmlExtractor.WebExtractorTaskProcessor;
 import marshallers.*;
 import messaging.FlowControl;
 import messaging.Message;
 import objects.Result;
 import objects.Task;
+import objects.TaskType;
 import objects.TaskUri;
 
 import java.io.IOException;
@@ -23,7 +26,9 @@ public class ClientApplication {
                 ConfigProvider.getProperties()
         );
 
-        TaskProcessor<Task, Result> taskProcessor = new AppenderTaskProcessor();
+        CompositeTaskProcessor compositeTaskProcessor = new CompositeTaskProcessor();
+        compositeTaskProcessor.registerProcessor(TaskType.HTML_EXTRACT, new WebExtractorTaskProcessor());
+
         Marshaller<Task> taskMarshaller = new IdOnlyTaskMarshaller();
         Marshaller<TaskUri> taskUriMarshaller = new TaskUriMarshaller();
         MessageMarshaller messageMarshaller = new MessageMarshaller(
@@ -55,7 +60,7 @@ public class ClientApplication {
                     return;
                 }
                 Message resultMessage = new Message(
-                        taskProcessor.process(task),
+                        compositeTaskProcessor.process(task),
                         i != 7 ? FlowControl.GETNEXTTASK : FlowControl.LAST
                 );
                 String messageMarshalled = messageMarshaller.marshall(resultMessage);

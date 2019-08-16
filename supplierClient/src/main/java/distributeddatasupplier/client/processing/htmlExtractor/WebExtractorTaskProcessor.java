@@ -25,7 +25,6 @@ public class WebExtractorTaskProcessor implements TaskProcessor<Task, Result> {
         if (null == content) {
             return new Result(resultUri, task.getUri(), Collections.emptyMap());
         }
-        //TODO: finish implementation
         Map<String, String> resultContent = new HashMap<>();
         ElementsWrapperInterpreter elementsWrapperInterpreter = new ElementsWrapperInterpreter(extractor);
         List<Map<String, String>> extracted = elementsWrapperInterpreter.apply(content);
