@@ -5,9 +5,10 @@ import objects.Result;
 import objects.ResultUri;
 import objects.Task;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
+
+import static objects.SerializationConstants.EXTRACTED;
+import static objects.SerializationConstants.MULTIVALUE;
 
 public class WebExtractorTaskProcessor implements TaskProcessor<Task, Result> {
 
@@ -18,13 +19,18 @@ public class WebExtractorTaskProcessor implements TaskProcessor<Task, Result> {
         String url = taskProperties.get("url");
         String extractor = taskProperties.get("extractor");
         if (null == url || null == extractor) {
-            return new Result(resultUri, task.getUri(), new HashMap<>());
+            return new Result(resultUri, task.getUri(), Collections.emptyMap());
         }
         String content = UrlContentExtractor.getByUrl(url);
         if (null == content) {
-            return new Result(resultUri, task.getUri(), new HashMap<>());
+            return new Result(resultUri, task.getUri(), Collections.emptyMap());
         }
         //TODO: finish implementation
+        Map<String, String> resultContent = new HashMap<>();
+        ElementsWrapperInterpreter elementsWrapperInterpreter = new ElementsWrapperInterpreter(extractor);
+        List<Map<String, String>> extracted = elementsWrapperInterpreter.apply(content);
+        resultContent.put(MULTIVALUE, "TRUE");
+        resultContent.put(EXTRACTED, extracted.toString());
         return null;
     }
 
