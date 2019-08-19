@@ -79,7 +79,7 @@ public class SimpleHandler implements Handler {
                     System.out.println("unexpected message, result == null, message " + message);
                     return;
                 }
-            } else {
+            } else if (!Objects.equals(Result.EMPTY_RESULT, result)) {
                 resultService.add(result);
                 resultConsumer.accept(result);
                 taskSupplier.markTaskAsFinished(result.getTaskUri());

@@ -14,4 +14,15 @@ public class ClientConfigurationService extends ConfigurationService {
         return properties.getProperty("tenantId");
     }
 
+    public int getNumberOfAttemptsToGetNewTask() {
+        return Integer.parseInt(properties.getProperty("newTaskAttempts", "8"));
+    }
+
+    public long getNewTaskAttemptPause() {
+        return Long.parseLong(properties.getProperty("newTaskAttemptPause", "10000"));
+    }
+
+    public int getNumberOfCyclesToProcess() {
+        return Integer.parseInt(properties.getProperty("numberOfCyclesToProcess", "128"));
+    }
 }

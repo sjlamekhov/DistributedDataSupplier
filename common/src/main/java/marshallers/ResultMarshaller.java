@@ -9,19 +9,25 @@ import java.util.Map;
 
 public class ResultMarshaller implements Marshaller<Result> {
 
+    private static final String RESULT_URI_SEPARATOR = "_&_";
     private static final String BODY_SEPARATOR = "_!_";
     private static final String FIELD_SEPARATOR = "_;_";
     private static final String KEYVALUE_SEPARATOR = "_->_";
 
+    private final Marshaller<ResultUri> resultUriMarshaller;
     private final Marshaller<TaskUri> taskUriMarshaller;
 
-    public ResultMarshaller(Marshaller<TaskUri> taskUriMarshaller) {
+    public ResultMarshaller(Marshaller<ResultUri> resultUriMarshaller,
+                            Marshaller<TaskUri> taskUriMarshaller) {
+        this.resultUriMarshaller = resultUriMarshaller;
         this.taskUriMarshaller = taskUriMarshaller;
     }
 
     @Override
     public String marshall(Result result) {
         StringBuilder stringBuffer = new StringBuilder();
+        stringBuffer.append(resultUriMarshaller.marshall(result.getUri()));
+        stringBuffer.append(RESULT_URI_SEPARATOR);
         stringBuffer.append(taskUriMarshaller.marshall(result.getTaskUri()));
         stringBuffer.append(BODY_SEPARATOR);
         if (result.getFields().isEmpty()) {
@@ -38,7 +44,9 @@ public class ResultMarshaller implements Marshaller<Result> {
 
     @Override
     public Result unmarshall(String string) {
-        String[] uriAndBody = string.split(BODY_SEPARATOR);
+        String[] resultUriAndRest = string.split(RESULT_URI_SEPARATOR);
+        ResultUri resultUri = resultUriMarshaller.unmarshall(resultUriAndRest[0]);
+        String[] uriAndBody = resultUriAndRest[1].split(BODY_SEPARATOR);
         TaskUri taskUri = taskUriMarshaller.unmarshall(uriAndBody[0]);
         Map<String, String> fields = new HashMap<>();
         String[] splitted = uriAndBody[1].split(FIELD_SEPARATOR);
@@ -46,6 +54,6 @@ public class ResultMarshaller implements Marshaller<Result> {
             String[] splittedEntry = splitted[i].split(KEYVALUE_SEPARATOR);
             fields.put(splittedEntry[0], splittedEntry[1]);
         }
-        return new Result(new ResultUri(taskUri.getTenantId()), taskUri, fields);
+        return new Result(resultUri, taskUri, fields);
     }
 }

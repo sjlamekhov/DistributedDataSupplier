@@ -10,4 +10,6 @@ public class ResultUri extends AbstractObjectUri {
         super(id, tenantId);
     }
 
+    public static ResultUri EMPTY = new ResultUri("EMPTY", "_null_");
+
 }

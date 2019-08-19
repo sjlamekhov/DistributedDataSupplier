@@ -35,8 +35,9 @@ public class PlatformFactory {
         Transceiver transceiver = new NetworkTransceiver();
 
         Marshaller<Task> taskMarshaller = new IdOnlyTaskMarshaller();
+        Marshaller<ResultUri> resultUriMarshaller = new ResultUriMarshaller();
         Marshaller<TaskUri> taskUriMarshaller = new TaskUriMarshaller();
-        Marshaller<Result> resultMarshaller = new ResultMarshaller(taskUriMarshaller);
+        Marshaller<Result> resultMarshaller = new ResultMarshaller(resultUriMarshaller, taskUriMarshaller);
         Marshaller<Message> messageMarshaller = new MessageMarshaller(taskMarshaller, resultMarshaller);
 
         ServerStatusService serverStatusService = new ServerStatusService();

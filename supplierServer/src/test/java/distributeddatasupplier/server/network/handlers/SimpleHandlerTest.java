@@ -5,7 +5,7 @@ import dao.ResultDao;
 import dao.TaskDao;
 import distributeddatasupplier.server.services.ResultService;
 import distributeddatasupplier.server.services.status.ServerStatusService;
-import marshallers.TaskUriMarshaller;
+import marshallers.*;
 import mocks.ResultConsumerMock;
 import objects.*;
 import persistence.InMemoryPersistence;
@@ -15,9 +15,6 @@ import persistence.tasks.InMemoryTaskPersistence;
 import persistence.tasks.TaskPersistenceLayer;
 import distributeddatasupplier.server.services.TaskService;
 import distributeddatasupplier.server.suppliers.TaskSupplier;
-import marshallers.IdOnlyTaskMarshaller;
-import marshallers.MessageMarshaller;
-import marshallers.ResultMarshaller;
 import messaging.FlowControl;
 import messaging.Message;
 import mocks.MockSelectorFactory;
@@ -28,8 +25,6 @@ import org.junit.Test;
 
 import java.io.IOException;
 import java.util.*;
-import java.util.function.Consumer;
-import java.util.stream.Collectors;
 
 public class SimpleHandlerTest {
 
@@ -105,7 +100,7 @@ public class SimpleHandlerTest {
         resultConsumer = new ResultConsumerMock();
         taskSupplier = new TaskSupplier(taskService);
         messageMarshaller = new MessageMarshaller(new IdOnlyTaskMarshaller(),
-                new ResultMarshaller(new TaskUriMarshaller()));
+                new ResultMarshaller(new ResultUriMarshaller(), new TaskUriMarshaller()));
         fillTestMessages(sendedMessages, receivedMessages);
         ServerStatusService serverStatusService = new ServerStatusService();
         simpleHandler = new SimpleHandler(

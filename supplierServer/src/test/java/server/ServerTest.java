@@ -4,7 +4,7 @@ import dao.CompositeTaskDao;
 import dao.TaskDao;
 import distributeddatasupplier.server.ServerLoop;
 import distributeddatasupplier.server.network.selectorfactory.SelectorFactory;
-import marshallers.TaskUriMarshaller;
+import marshallers.*;
 import objects.TaskUri;
 import persistence.converters.TaskConverter;
 import persistence.tasks.InMemoryTaskPersistence;
@@ -13,11 +13,8 @@ import distributeddatasupplier.server.services.TaskService;
 import distributeddatasupplier.server.suppliers.TaskSupplier;
 import mocks.MockSelectorFactory;
 import mocks.DumpableHandler;
-import marshallers.MessageMarshaller;
-import marshallers.ResultMarshaller;
 import org.junit.Test;
 import objects.Task;
-import marshallers.IdOnlyTaskMarshaller;
 
 import java.io.IOException;
 import java.util.Collections;
@@ -31,7 +28,8 @@ public class ServerTest {
     private static final String tenantId = "tenantId";
 
     private static MessageMarshaller getMessageMarshaller() {
-        return new MessageMarshaller(new IdOnlyTaskMarshaller(), new ResultMarshaller(new TaskUriMarshaller()));
+        return new MessageMarshaller(new IdOnlyTaskMarshaller(),
+                new ResultMarshaller(new ResultUriMarshaller(), new TaskUriMarshaller()));
     }
 
     private static DumpableHandler getHandler() {

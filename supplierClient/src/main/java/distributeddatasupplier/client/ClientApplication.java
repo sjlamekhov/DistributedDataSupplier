@@ -2,17 +2,12 @@ package distributeddatasupplier.client;
 
 import configuration.ConfigProvider;
 import distributeddatasupplier.client.configuration.ClientConfigurationService;
-import distributeddatasupplier.client.processing.AppenderTaskProcessor;
 import distributeddatasupplier.client.processing.CompositeTaskProcessor;
-import distributeddatasupplier.client.processing.TaskProcessor;
 import distributeddatasupplier.client.processing.htmlExtractor.WebExtractorTaskProcessor;
 import marshallers.*;
 import messaging.FlowControl;
 import messaging.Message;
-import objects.Result;
-import objects.Task;
-import objects.TaskType;
-import objects.TaskUri;
+import objects.*;
 
 import java.io.IOException;
 import java.util.Objects;
@@ -31,18 +26,24 @@ public class ClientApplication {
 
         Marshaller<Task> taskMarshaller = new IdOnlyTaskMarshaller();
         Marshaller<TaskUri> taskUriMarshaller = new TaskUriMarshaller();
+        Marshaller<ResultUri> resultUriMarshaller = new ResultUriMarshaller();
         MessageMarshaller messageMarshaller = new MessageMarshaller(
-                taskMarshaller, new ResultMarshaller(taskUriMarshaller)
+                taskMarshaller,
+                new ResultMarshaller(resultUriMarshaller, taskUriMarshaller)
         );
         Client client = new Client(configurationService.getHost(), configurationService.getPort());
         if (!client.isStarted()) {
             System.out.println("supplierClient did not start due to network issues");
             return;
         }
+        int attemptsToGetNewTask = configurationService.getNumberOfAttemptsToGetNewTask();
+        long newTaskAttemptPause = configurationService.getNewTaskAttemptPause();
+        int numberOfCyclesToProcess = configurationService.getNumberOfCyclesToProcess();
+        int attemptsCount = 0;
         int receiveCount = 0;
         int sentCount = 0;
         try {
-            for (int i = 0; i < 8; i++) {
+            for (int i = 0; i < numberOfCyclesToProcess; i++) {
                 String message = client.getMessage();
                 receiveCount++;
 
@@ -55,18 +56,26 @@ public class ClientApplication {
                     client.stop();
                     return;
                 } else if (Objects.equals(task.getUri(), Task.EMPTY_TASK.getUri())) {
-                    client.sendMessage(messageMarshaller.marshall(new Message(FlowControl.BYE)));
-                    client.stop();
-                    return;
+                    if (attemptsCount < attemptsToGetNewTask) {
+                        client.sendMessage(messageMarshaller.marshall(new Message(Result.EMPTY_RESULT, FlowControl.GETNEXTTASK)));
+                        sleepBeforeNextAttempt(newTaskAttemptPause);
+                        sentCount++;
+                        attemptsCount++;
+                    } else {
+                        client.sendMessage(messageMarshaller.marshall(new Message(FlowControl.BYE)));
+                        client.stop();
+                        return;
+                    }
+                } else {
+                    Message resultMessage = new Message(
+                            compositeTaskProcessor.process(task),
+                            i != numberOfCyclesToProcess - 1 ? FlowControl.GETNEXTTASK : FlowControl.LAST
+                    );
+                    String messageMarshalled = messageMarshaller.marshall(resultMessage);
+                    client.sendMessage(messageMarshalled);
+                    sentCount++;
+                    System.out.println("sent:\t" + messageMarshalled);
                 }
-                Message resultMessage = new Message(
-                        compositeTaskProcessor.process(task),
-                        i != 7 ? FlowControl.GETNEXTTASK : FlowControl.LAST
-                );
-                String messageMarshalled = messageMarshaller.marshall(resultMessage);
-                client.sendMessage(messageMarshalled);
-                sentCount++;
-                System.out.println("sent:\t" + messageMarshalled);
             }
         } catch (IOException e) {
             System.out.println("supplierClient will be finished, server seems to be stopped");
@@ -74,5 +83,11 @@ public class ClientApplication {
         System.out.println("sentCount=" + sentCount + "\treceiveCount=" + receiveCount);
         client.stop();
         System.out.println("supplierClient finished");
+    }
+
+    private static void sleepBeforeNextAttempt(long newTaskAttemptPause) {
+        try {
+            Thread.sleep(newTaskAttemptPause);
+        } catch (InterruptedException ignore) {}
     }
 }
