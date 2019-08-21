@@ -13,5 +13,11 @@ public interface ConfigurationConstants {
     String TASKS_TABLENAME = "tasks";
     String RESULTS_TABLENAME = "results";
 
+    String RESULT_CONSUMER_TYPE ="resultConsumerType";
+    String RESULT_CONSUMER_NONE ="NO_CONSUMER";
+    String RESULT_CONSUMER_REST ="REST_API_CONSUMER";
+    String RESULT_CONSUMER_TEMPLATE ="resultConsumerTemplate";
+    String RESULT_CONSUMER_URL ="resultConsumerUrl";
+
     String DEMO_MODE = "demoMode";
 }

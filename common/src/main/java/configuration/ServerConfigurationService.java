@@ -1,5 +1,7 @@
 package configuration;
 
+import persistence.converters.ResultConverter;
+
 import java.util.*;
 
 import static configuration.ConfigurationConstants.*;
@@ -46,5 +48,17 @@ public class ServerConfigurationService extends ConfigurationService {
 
     public boolean isDemoMode() {
         return properties.containsKey(DEMO_MODE);
+    }
+
+    public String getResultConsumerType() {
+        return properties.getProperty(RESULT_CONSUMER_TYPE, RESULT_CONSUMER_NONE);
+    }
+
+    public String getResultConsumerUrl() {
+        return properties.getProperty(RESULT_CONSUMER_URL, "http://localhost:80");
+    }
+
+    public String getResultConsumerTemplate() {
+        return properties.getProperty(RESULT_CONSUMER_TEMPLATE, "{}");
     }
 }

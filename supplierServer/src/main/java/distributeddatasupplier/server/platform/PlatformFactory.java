@@ -2,6 +2,7 @@ package distributeddatasupplier.server.platform;
 
 import configuration.ServerConfigurationService;
 import dao.*;
+import distributeddatasupplier.server.consumers.ResultConsumerFactory;
 import distributeddatasupplier.server.network.handlers.Handler;
 import distributeddatasupplier.server.network.handlers.SimpleHandler;
 import distributeddatasupplier.server.network.messageTransceiver.NetworkTransceiver;
@@ -18,6 +19,7 @@ import objects.Task;
 import objects.TaskUri;
 
 import java.util.Properties;
+import java.util.function.Consumer;
 
 public class PlatformFactory {
 
@@ -29,6 +31,8 @@ public class PlatformFactory {
 
         CompositeResultDao resultDao = DaoFactory.buildResultDao(serverConfigurationService);
         ResultService resultService = new ResultService(resultDao);
+
+        Consumer<Result> resultConsumer = ResultConsumerFactory.buildConsumer(serverConfigurationService);
 
         TaskSupplier taskSupplier = new TaskSupplier(taskService);
 
@@ -46,6 +50,7 @@ public class PlatformFactory {
                 serverConfigurationService.getTenantIds(),
                 taskSupplier,
                 resultService,
+                resultConsumer,
                 transceiver,
                 messageMarshaller,
                 serverStatusService
