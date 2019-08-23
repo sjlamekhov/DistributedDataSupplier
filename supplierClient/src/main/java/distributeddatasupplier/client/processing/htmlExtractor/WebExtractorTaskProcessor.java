@@ -1,16 +1,23 @@
 package distributeddatasupplier.client.processing.htmlExtractor;
 
 import distributeddatasupplier.client.processing.TaskProcessor;
+import marshallers.ListMapMarshaller;
 import objects.Result;
 import objects.ResultUri;
 import objects.Task;
 
 import java.util.*;
 
-import static objects.SerializationConstants.EXTRACTED;
+import static objects.SerializationConstants.VALUES;
 import static objects.SerializationConstants.MULTIVALUE;
 
 public class WebExtractorTaskProcessor implements TaskProcessor<Task, Result> {
+
+    private final ListMapMarshaller listMapMarshaller;
+
+    public WebExtractorTaskProcessor() {
+        this.listMapMarshaller = new ListMapMarshaller();
+    }
 
     @Override
     public Result process(Task task) {
@@ -29,8 +36,8 @@ public class WebExtractorTaskProcessor implements TaskProcessor<Task, Result> {
         ElementsWrapperInterpreter elementsWrapperInterpreter = new ElementsWrapperInterpreter(extractor);
         List<Map<String, String>> extracted = elementsWrapperInterpreter.apply(content);
         resultContent.put(MULTIVALUE, "TRUE");
-        resultContent.put(EXTRACTED, extracted.toString());
-        return null;
+        resultContent.put(VALUES, listMapMarshaller.marshall(extracted));
+        return new Result(resultUri, task.getUri(), resultContent);
     }
 
 }

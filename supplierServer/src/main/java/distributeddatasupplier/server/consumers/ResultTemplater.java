@@ -1,11 +1,13 @@
 package distributeddatasupplier.server.consumers;
 
+import marshallers.ListMapMarshaller;
 import objects.Result;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.function.Function;
+
+import static objects.SerializationConstants.MULTIVALUE;
+import static objects.SerializationConstants.VALUES;
 
 /**
  * template example:
@@ -17,6 +19,7 @@ public class ResultTemplater implements Function<Result, String> {
     public static final String FIELD_POSTFIX = "_field";
     private final String template;
     private final Map<String, Function<Result,String>> extractors;
+    private final ListMapMarshaller listMapMarshaller;
 
     public ResultTemplater(String template) {
         this.template = template;
@@ -33,10 +36,29 @@ public class ResultTemplater implements Function<Result, String> {
             }
             return marshalled;
         });
+        this.listMapMarshaller = new ListMapMarshaller();
     }
 
     @Override
     public String apply(Result result) {
+        if ("TRUE".equals(result.getFields().get(MULTIVALUE))) {
+            String stringedMap = result.getFields().get(VALUES);
+            if (null == stringedMap) {
+                return null;
+            }
+            List<Map<String, String>> parsed = listMapMarshaller.unmarshall(stringedMap);
+            List<String> singleValueResults = new ArrayList<>();
+            for (Map<String, String> map : parsed) {
+                singleValueResults.add(applySingleValue(new Result(result.getUri(), result.getTaskUri(), map)));
+            }
+            return wrap(singleValueResults.stream()
+                    .reduce((i1, i2) -> i1 + "," + i2).orElse(""));
+        } else {
+            return wrap(applySingleValue(result));
+        }
+    }
+
+    private String applySingleValue(Result result) {
         if (!checkIfResultValid(result)) {
             return null;
         }
@@ -50,6 +72,10 @@ public class ResultTemplater implements Function<Result, String> {
             }
         }
         return templatedResult;
+    }
+
+    private static String wrap(String input) {
+        return "[" + input + "]";
     }
 
     private static boolean checkIfResultValid(Result result) {

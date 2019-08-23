@@ -3,7 +3,7 @@ package objects;
 public interface SerializationConstants {
 
     String MULTIVALUE = "MULTIVALUE";
-    String EXTRACTED = "EXTRACTED";
+    String VALUES = "VALUES";
 
     String EXTRACTOR_SEPARATOR = "->";
     String EXTRACTOR_MAP_CHAR = "=>";
