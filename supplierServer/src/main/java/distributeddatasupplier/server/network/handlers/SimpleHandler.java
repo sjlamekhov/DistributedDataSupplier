@@ -10,6 +10,8 @@ import messaging.Message;
 import objects.Result;
 import distributeddatasupplier.server.suppliers.TaskSupplier;
 import objects.Task;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
 import java.nio.channels.SelectionKey;
@@ -21,6 +23,8 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Consumer;
 
 public class SimpleHandler implements Handler {
+
+    private static Logger logger = LogManager.getLogger(SimpleHandler.class);
 
     private final Set<String> tenantIds;
     private final TaskSupplier taskSupplier;
@@ -76,7 +80,7 @@ public class SimpleHandler implements Handler {
             if (result == null) {
                 key.cancel();
                 if (messageObject.getFlowControl() != FlowControl.BYE) {
-                    System.out.println("unexpected message, result == null, message " + message);
+                    logger.info("unexpected message, result == null, message " + message);
                     return;
                 }
             } else if (!Objects.equals(Result.EMPTY_RESULT, result)) {
@@ -85,7 +89,7 @@ public class SimpleHandler implements Handler {
                 taskSupplier.markTaskAsFinished(result.getTaskUri());
                 serverStatusService.setNumberOfProcessedTasks(numberOfProcessedTasks.incrementAndGet());
             }
-            System.out.println(String.format("from %s:\t%s", selector.hashCode(), messageObject));
+            logger.info(String.format("from %s:\t%s", selector.hashCode(), messageObject));
             if (messageObject.getFlowControl() == FlowControl.GETNEXTTASK) {
                 SelectorUtils.prepareForWrite(selector, key);
             } else if (messageObject.getFlowControl() == FlowControl.LAST) {

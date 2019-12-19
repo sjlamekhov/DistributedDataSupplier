@@ -8,14 +8,18 @@ import marshallers.*;
 import messaging.FlowControl;
 import messaging.Message;
 import objects.*;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
 import java.util.Objects;
 
 public class ClientApplication {
 
+    private static Logger logger = LogManager.getLogger(ClientApplication.class);
+
     public static void main(String[] args) throws IOException {
-        System.out.println("supplierClient started");
+        logger.info("supplierClient started");
 
         ClientConfigurationService configurationService = new ClientConfigurationService(
                 ConfigProvider.getProperties()
@@ -33,7 +37,7 @@ public class ClientApplication {
         );
         Client client = new Client(configurationService.getHost(), configurationService.getPort());
         if (!client.isStarted()) {
-            System.out.println("supplierClient did not start due to network issues");
+            logger.info("supplierClient did not start due to network issues");
             return;
         }
         int attemptsToGetNewTask = configurationService.getNumberOfAttemptsToGetNewTask();
@@ -49,10 +53,10 @@ public class ClientApplication {
 
                 Message messageObject = messageMarshaller.unmarshall(message);
 
-                System.out.println("received:\t" + message);
+                logger.info("received:\t" + message);
                 Task task = messageObject.getTask();
                 if (task == null) {
-                    System.out.println("unexpected message, task == null");
+                    logger.info("unexpected message, task == null");
                     client.stop();
                     return;
                 } else if (Objects.equals(task.getUri(), Task.EMPTY_TASK.getUri())) {
@@ -74,15 +78,15 @@ public class ClientApplication {
                     String messageMarshalled = messageMarshaller.marshall(resultMessage);
                     client.sendMessage(messageMarshalled);
                     sentCount++;
-                    System.out.println("sent:\t" + messageMarshalled);
+                    logger.info("sent:\t" + messageMarshalled);
                 }
             }
         } catch (IOException e) {
-            System.out.println("supplierClient will be finished, server seems to be stopped");
+            logger.info("supplierClient will be finished, server seems to be stopped");
         }
-        System.out.println("sentCount=" + sentCount + "\treceiveCount=" + receiveCount);
+        logger.info("sentCount=" + sentCount + "\treceiveCount=" + receiveCount);
         client.stop();
-        System.out.println("supplierClient finished");
+        logger.info("supplierClient finished");
     }
 
     private static void sleepBeforeNextAttempt(long newTaskAttemptPause) {

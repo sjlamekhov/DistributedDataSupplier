@@ -1,6 +1,8 @@
 package distributeddatasupplier.server;
 
 import distributeddatasupplier.server.network.handlers.Handler;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
 import java.nio.channels.SelectionKey;
@@ -10,6 +12,8 @@ import java.util.Iterator;
 import java.util.Set;
 
 public class ServerLoop {
+
+    private static Logger logger = LogManager.getLogger(ServerLoop.class);
 
     private boolean isStopped;
     private final long maxExecutionTime;
@@ -61,7 +65,7 @@ public class ServerLoop {
                         handledReadable++;
                     }
                     numberOfReceivedRequests++;
-                    System.out.println(String.format("a:%s, r:%s, w:%s", handledAcceptable, handledReadable, handledWritable));
+                    logger.info(String.format("a:%s, r:%s, w:%s", handledAcceptable, handledReadable, handledWritable));
                 } catch (Exception e) {
                     key.channel().close();
                 }
@@ -72,7 +76,7 @@ public class ServerLoop {
 
     private void isExecutionTimeExceeded(long startupTime, long numberOfReceivedRequests) {
         if (maxExecutionTime != -1 && (System.currentTimeMillis() - startupTime) >= maxExecutionTime) {
-            System.out.println(String.format("limit of executionTime is reached, numberOfReceivedRequests:\t%s",
+            logger.info(String.format("limit of executionTime is reached, numberOfReceivedRequests:\t%s",
                     numberOfReceivedRequests));
             stop();
         }

@@ -11,6 +11,8 @@ import distributeddatasupplier.server.services.TaskService;
 import distributeddatasupplier.server.services.status.ServerStatusService;
 import objects.Task;
 import objects.TaskUri;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -27,6 +29,8 @@ import java.util.UUID;
 @Configuration
 @EnableAsync
 public class ServerConfig {
+
+    private static Logger logger = LogManager.getLogger(ServerConfig.class);
 
     @Autowired
     private Platform platform;
@@ -106,9 +110,9 @@ public class ServerConfig {
         TaskService taskService = platform.getTaskService();
         for (int i = 0; i < 16; i++) {
             Task task = new Task(new TaskUri(UUID.randomUUID().toString(), "tenantId"), new HashMap<>());
-            System.out.println("taskId:\t" + task.getUri());
+            logger.info("taskId:\t" + task.getUri());
             taskService.add(task);
-            System.out.println("taskId:\t" + task.getUri() + "\tadded");
+            logger.info("taskId:\t" + task.getUri() + "\tadded");
         }
     }
 

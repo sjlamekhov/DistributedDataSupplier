@@ -8,6 +8,8 @@ import distributeddatasupplier.server.suppliers.TaskSupplier;
 import marshallers.MessageMarshaller;
 import messaging.FlowControl;
 import messaging.Message;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
 import java.nio.channels.SelectionKey;
@@ -18,6 +20,8 @@ import java.util.Collections;
 import java.util.List;
 
 public class DumpableHandler implements Handler {
+
+    private static Logger logger = LogManager.getLogger(DumpableHandler.class);
 
     private final TaskSupplier taskSupplier;
     private final Transceiver transceiver;
@@ -53,7 +57,7 @@ public class DumpableHandler implements Handler {
         String message = transceiver.getMessage(key);
         if (!message.isEmpty()) {
             messagesFromClient.add(message);
-            System.out.println(String.format("from %s:\t%s", selector.hashCode(), message));
+            logger.info(String.format("from %s:\t%s", selector.hashCode(), message));
             SelectorUtils.prepareForWrite(selector, key);
         }
     }
