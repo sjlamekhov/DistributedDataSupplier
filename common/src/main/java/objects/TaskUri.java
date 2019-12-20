@@ -2,8 +2,8 @@ package objects;
 
 public class TaskUri extends AbstractObjectUri {
 
-    public TaskUri(String taskId) {
-        super(taskId);
+    public TaskUri(String tenantId) {
+        super(tenantId);
     }
 
     public TaskUri(String id, String tenantId) {

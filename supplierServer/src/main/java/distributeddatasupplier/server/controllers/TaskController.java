@@ -42,7 +42,12 @@ public class TaskController {
     public Task addTask(@PathVariable("tenantId") String tenantId,
                             @RequestBody Task task) {
         try {
-            return taskService.add(new Task(new TaskUri(tenantId), task.getTaskProperties()));
+            TaskUri uriToAdd = null == task.getUri() ? new TaskUri(tenantId) : task.getUri();
+            Task taskToAdd = new Task(uriToAdd, task.getTaskProperties());
+            if (task.getTaskStatus() != null) {
+                taskToAdd.setTaskStatus(task.getTaskStatus());
+            }
+            return taskService.add(taskToAdd);
         } catch (Exception e) {
             throw new RuntimeException(e.toString());
         }
