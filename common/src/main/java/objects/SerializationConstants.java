@@ -13,4 +13,10 @@ public interface SerializationConstants {
 
     String RESULT_STATUS = "RESULT_STATUS";
     String TASK_TYPE = "TASK_TYPE";
+
+    String CODE_TO_EVAL = "codeToEval";
+    String JS_TASK_PROCESSOR = "jsTaskProcessor";
+    String TYPE = "type";
+    String PARAMETERS = "parameters";
+    String EVAL_RESULT = "evalResult";
 }

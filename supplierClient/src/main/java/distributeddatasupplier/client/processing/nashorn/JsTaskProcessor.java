@@ -17,12 +17,10 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
+import static objects.SerializationConstants.*;
+
 public class JsTaskProcessor implements TaskProcessor<Task, Result> {
 
-    private static final String CODE_TO_EVAL = "codeToEval";
-    private static final String JS_TASK_PROCESSOR = "jsTaskProcessor";
-    private static final String TYPE = "type";
-    private static final String PARAMETERS = "parameters";
     private final ScriptEngine engine;
     private final ObjectMapper mapper = new ObjectMapper();
 
@@ -48,7 +46,7 @@ public class JsTaskProcessor implements TaskProcessor<Task, Result> {
             }
             if (null != evalResult) {
                 Map<String, String> resultParameters = new HashMap<>();
-                resultParameters.put("evalResult", evalResult.toString());
+                resultParameters.put(EVAL_RESULT, evalResult.toString());
                 return new Result(
                         new ResultUri(Objects.requireNonNull(task.getUri()).getTenantId()),
                         task.getUri(),
@@ -70,31 +68,6 @@ public class JsTaskProcessor implements TaskProcessor<Task, Result> {
             return false;
         }
         return true;
-    }
-
-    public static void main(String[] args) throws ScriptException, NoSuchMethodException, JsonProcessingException {
-        ObjectMapper mapper = new ObjectMapper();
-        JsTaskProcessor jsTaskProcessor = new JsTaskProcessor();
-        Map<String, String> parameters = new HashMap<>();
-        parameters.put("aKey", "aValue");
-        parameters.put("bKey", "bValue");
-
-        jsTaskProcessor.eval("function func(input) {" +
-                        "print(input);" +
-                        "return input;" +
-                        "}",
-                mapper.valueToTree(parameters));
-
-        Map<String, String> taskProperties = new HashMap<>();
-        taskProperties.put(TYPE, JS_TASK_PROCESSOR);
-        taskProperties.put(PARAMETERS,"{\"a\": \"b\"}");
-        taskProperties.put(CODE_TO_EVAL, "function func(input) {" +
-                "print(input);" +
-                "return input;" +
-                "}");
-        Task task = new Task(new TaskUri("tenant"), taskProperties);
-        Result result = jsTaskProcessor.process(task);
-        System.out.println(result);
     }
 
 }
