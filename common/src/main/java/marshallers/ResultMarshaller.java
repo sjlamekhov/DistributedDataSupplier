@@ -7,12 +7,9 @@ import objects.TaskUri;
 import java.util.HashMap;
 import java.util.Map;
 
-public class ResultMarshaller implements Marshaller<Result> {
+import static marshallers.MarshallerConstants.*;
 
-    private static final String RESULT_URI_SEPARATOR = "_&_";
-    private static final String BODY_SEPARATOR = "_!_";
-    private static final String FIELD_SEPARATOR = "_;_";
-    private static final String KEYVALUE_SEPARATOR = "_->_";
+public class ResultMarshaller implements Marshaller<Result> {
 
     private final Marshaller<ResultUri> resultUriMarshaller;
     private final Marshaller<TaskUri> taskUriMarshaller;

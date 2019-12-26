@@ -20,4 +20,9 @@ public interface ConfigurationConstants {
     String RESULT_CONSUMER_URL ="resultConsumerUrl";
 
     String DEMO_MODE = "demoMode";
+
+    String TENANT_ID = "tenantId";
+    String NEW_TASK_ATTEMPTS = "newTaskAttempts";
+    String NEW_TASK_ATTEMPT_PAUSE = "newTaskAttemptPause";
+    String NUMBER_OF_CYCLES_TO_PROCESS = "numberOfCyclesToProcess";
 }
