@@ -20,10 +20,10 @@ public class ResultService {
     }
 
     public Result getByUri(ResultUri resultUri) {
-        return (Result) resultDao.getByUri(resultUri);
+        return resultDao.getByUri(resultUri);
     }
 
-    public Collection<ResultUri> getObjectUris(int responseSizeLimit) {
-        return resultDao.getObjectUris(responseSizeLimit);
+    public Collection<ResultUri> getObjectUris(String tenantId, int responseSizeLimit) {
+        return resultDao.getObjectUris(tenantId, responseSizeLimit);
     }
 }

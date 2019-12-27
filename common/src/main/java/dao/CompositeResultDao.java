@@ -26,6 +26,11 @@ public class CompositeResultDao extends ResultDao {
     }
 
     @Override
+    public Collection<ResultUri> getObjectUris(String tenantId, int responseSizeLimit) {
+        return getDaoInternal(tenantId).getObjectUris(tenantId, responseSizeLimit);
+    }
+
+    @Override
     public boolean isUriPresented(ResultUri uri) {
         String tenantId = uri.getTenantId();
         return getDaoInternal(tenantId).isUriPresented(uri);

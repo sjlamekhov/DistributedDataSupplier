@@ -22,8 +22,9 @@ public class ResultController {
 
     @RequestMapping(value = "/tenants/{tenantId}/results",
             produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.GET)
-    public Collection<ResultUri> getTasksByStatus(@PathVariable("tenantId") String tenantId) {
-        return resultService.getObjectUris(RESPONSE_SIZE_LIMIT);
+    public Collection<ResultUri> getResult(@PathVariable("tenantId") String tenantId,
+                                           @PathVariable("limit") Integer limit) {
+        return resultService.getObjectUris(tenantId, limit != null ? limit : RESPONSE_SIZE_LIMIT);
     }
 
     @RequestMapping(value = "/tenants/{tenantId}/results/{resultId}",

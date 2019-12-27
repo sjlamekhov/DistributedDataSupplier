@@ -12,7 +12,7 @@ public class ResultDao extends AbstractDao<ResultUri, Result> {
         super(persistenceLayer);
     }
 
-    public Collection<ResultUri> getObjectUris(int responseSizeLimit) {
+    public Collection<ResultUri> getObjectUris(String tenantId, int responseSizeLimit) {
         return persistenceLayer.getObjectUris(responseSizeLimit);
     }
 
