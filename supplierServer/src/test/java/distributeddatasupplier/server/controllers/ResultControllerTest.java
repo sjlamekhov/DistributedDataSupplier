@@ -34,6 +34,8 @@ public class ResultControllerTest {
         Assert.assertNull(resultController.getResultById(testTenantId, result.getUri().getId()));
         resultService.add(result);
         Assert.assertNotNull(resultController.getResultById(testTenantId, result.getUri().getId()));
+        resultService.deleteByUri(result.getUri());
+        Assert.assertNull(resultController.getResultById(testTenantId, result.getUri().getId()));
     }
 
     @Test

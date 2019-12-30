@@ -26,4 +26,8 @@ public class ResultService {
     public Collection<ResultUri> getObjectUris(String tenantId, int responseSizeLimit) {
         return resultDao.getObjectUris(tenantId, responseSizeLimit);
     }
+
+    public void deleteByUri(ResultUri resultUri) {
+        resultDao.deleteObject(resultUri);
+    }
 }
