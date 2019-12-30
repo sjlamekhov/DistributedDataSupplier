@@ -49,9 +49,10 @@ public class ServerStatusServiceTest {
     public void getServerExecutionTime() {
         long sleepTime = 10000;
         ServerStatusService serverStatusService = new ServerStatusService();
-        try {Thread.sleep(sleepTime);} catch (Exception ignore) {}
+        try {Thread.sleep(sleepTime);} catch (Exception e) {e.printStackTrace();}
         ServerStatus serverStatus = serverStatusService.getServerStatus();
-        assertTrue(serverStatus.getServerExecutionTime() >= sleepTime);
+        long serverExecutionTime = serverStatus.getServerExecutionTime();
+        assertTrue(serverExecutionTime >= sleepTime);
     }
 
 }
