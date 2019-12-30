@@ -15,14 +15,14 @@ import java.util.Collection;
 @RestController
 public class ResultController {
 
-    private static final int RESPONSE_SIZE_LIMIT = 16;
+    public static final int RESPONSE_SIZE_LIMIT = 16;
 
     @Autowired
     private ResultService resultService;
 
     @RequestMapping(value = "/tenants/{tenantId}/results",
             produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.GET)
-    public Collection<ResultUri> getResult(@PathVariable("tenantId") String tenantId,
+    public Collection<ResultUri> getResults(@PathVariable("tenantId") String tenantId,
                                            @PathVariable("limit") Integer limit) {
         return resultService.getObjectUris(tenantId, limit != null ? limit : RESPONSE_SIZE_LIMIT);
     }
